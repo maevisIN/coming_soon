@@ -7,13 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initSystemClocks();
   initConsoleLogger();
   initSubscriptionForm();
-  initNavbarInteractions();
 });
 
 /**
  * 1. DYNAMIC SYSTEM CALIBRATION PROGRESS BAR
  */
-let progressInterval = null;
 function initProgressBar() {
   const progressBarEl = document.getElementById('progress-bar');
   const progressPctEl = document.getElementById('progress-percentage');
@@ -29,7 +27,7 @@ function initProgressBar() {
     progressPctEl.innerText = formatted;
   }
   updateProgress();
-  progressInterval = setInterval(updateProgress, 1000);
+  setInterval(updateProgress, 1000);
 }
 
 /**
@@ -62,7 +60,6 @@ function initSystemClocks() {
 /**
  * 3. SIMULATED SYSTEM LOG CONSOLE
  */
-let logInterval = null;
 const logDatabase = [
   { type: 'info', text: 'SYSTEM REBOOT INITIATED ON GENESIS NODE [RAAVH-SEC::92]' },
   { type: 'info', text: 'CALIBRATING CORE MEMORY ARRAYS...' },
@@ -85,10 +82,6 @@ let currentLogIndex = 0;
 function initConsoleLogger() {
   const outputEl = document.getElementById('console-output');
   if (!outputEl) return;
-
-  // Clear output on init
-  outputEl.innerHTML = '';
-  currentLogIndex = 0;
 
   function appendLog() {
     if (currentLogIndex >= logDatabase.length) {
@@ -113,7 +106,7 @@ function initConsoleLogger() {
   setTimeout(appendLog, 2000);
   
   // Set interval for ongoing logs
-  logInterval = setInterval(appendLog, 4500);
+  setInterval(appendLog, 4500);
 }
 
 function writeLogLine(type, text) {
@@ -168,12 +161,13 @@ function initSubscriptionForm() {
     responseEl.className = 'form-response';
     responseEl.innerText = 'UPLINK INITIATED. ENCRYPTING DATA PATH...';
 
-    // Simulate registration stages
+    // Simulate cybernetic registration stages
     setTimeout(() => {
       responseEl.innerText = 'GENERATING SECURE GENESIS AUTHENTICATOR...';
     }, 1000);
 
     setTimeout(() => {
+      // Create random access key
       const keyPart1 = Math.random().toString(36).substring(2, 6).toUpperCase();
       const keyPart2 = Math.random().toString(36).substring(2, 6).toUpperCase();
       const accessCode = `MVS-${keyPart1}-${keyPart2}`;
@@ -196,8 +190,10 @@ function initSubscriptionForm() {
   }
 
   function displaySuccessState(details) {
+    // Hide standard form elements
     formEl.style.display = 'none';
     
+    // Inject success content with terminal styling
     responseEl.className = 'form-response form-response-success';
     responseEl.innerHTML = `
       <div style="border: 1px solid var(--color-neon-green); padding: 1rem; border-radius: var(--radius-sm); text-align: left; background-color: var(--bg-primary);">
@@ -209,99 +205,5 @@ function initSubscriptionForm() {
     `;
     
     writeLogLine('success', 'CLIENT REGISTERED SECURELY. ACCESS KEY ENABLED.');
-  }
-}
-
-/**
- * 5. NAVBAR INTERACTIVE TABS CONTROL
- */
-function initNavbarInteractions() {
-  const tabs = document.querySelectorAll('.nav-tab-btn');
-  const logoBtn = document.getElementById('nav-logo-btn');
-  
-  const windowTitleEl = document.getElementById('gateway-node-title');
-  const subtitleTagEl = document.getElementById('node-subtitle-tag');
-  
-  const progressBarTitleEl = document.getElementById('progress-bar-title');
-  const progressBarEl = document.getElementById('progress-bar');
-  const progressPctEl = document.getElementById('progress-percentage');
-  const consoleNodeLabelEl = document.getElementById('console-node-label');
-
-  if (!tabs) return;
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const tabName = tab.getAttribute('data-tab');
-      
-      // Update active nav styles
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      
-      handleTabSwitch(tabName);
-    });
-  });
-
-  if (logoBtn) {
-    logoBtn.addEventListener('click', () => {
-      // Clicking logo returns to HOME tab
-      tabs.forEach(t => {
-        if (t.getAttribute('data-tab') === 'HOME') {
-          t.click();
-        }
-      });
-    });
-  }
-
-  function handleTabSwitch(tabName) {
-    // Write routing log to the terminal console
-    writeLogLine('info', `ROUTING LINK TO TARGET CHANNEL: [${tabName}]`);
-    
-    if (tabName === 'HOME') {
-      // Restore Home state
-      if (windowTitleEl) windowTitleEl.innerText = '[ GENESIS_GATEWAY_NODE ]';
-      if (subtitleTagEl) subtitleTagEl.innerText = 'SOL0425 // PORTAL CALIBRATION IN PROGRESS';
-      if (progressBarTitleEl) progressBarTitleEl.innerText = 'SYSTEM DECRYPTION STATUS';
-      if (consoleNodeLabelEl) consoleNodeLabelEl.innerText = 'SYSTEM LOGS [RAAVH-SEC::92]';
-      
-      // Restart normal progress bar calibration
-      if (progressInterval) clearInterval(progressInterval);
-      initProgressBar();
-      
-      writeLogLine('success', 'LINK RESTORED. GENESIS SEQUENCE ONLINE.');
-    } else {
-      // Simulated connection offline redirection (similar to main React App's routing limits)
-      let sectionCode = '';
-      let subtagText = '';
-      
-      switch (tabName) {
-        case 'SHOP':
-          sectionCode = 'SEC_92_OFFLINE';
-          subtagText = 'SEC::92 // ACCESS DENIED';
-          break;
-        case 'FABRICATE':
-          sectionCode = 'FBR_04_OFFLINE';
-          subtagText = 'FBR::04 // ACCESS DENIED';
-          break;
-        case 'BLOGS':
-          sectionCode = 'LOG_0_92_OFFLINE';
-          subtagText = 'LOG::0:92 // ACCESS DENIED';
-          break;
-      }
-      
-      // Change card title to offline alert
-      if (windowTitleEl) windowTitleEl.innerText = `[ ${sectionCode} ]`;
-      if (subtitleTagEl) subtitleTagEl.innerText = subtagText;
-      if (progressBarTitleEl) progressBarTitleEl.innerText = 'CHANNEL PING ATTEMPT';
-      if (consoleNodeLabelEl) consoleNodeLabelEl.innerText = `DIAGNOSTICS LOGGER [${tabName}]`;
-      
-      // Set progress bar to 0% to represent disconnected channel
-      if (progressInterval) clearInterval(progressInterval);
-      if (progressBarEl) progressBarEl.style.width = '0%';
-      if (progressPctEl) progressPctEl.innerText = '0.0000% [OFFLINE]';
-      
-      writeLogLine('error', `ERR_CONN_REFUSED: Requested channel [${tabName}] is currently offline.`);
-      writeLogLine('warn', 'REASON: External node requires secure genesis access key credentials.');
-      writeLogLine('info', 'SUGGESTION: Input credential email in enlistment box to calibrate uplink.');
-    }
   }
 }
