@@ -158,85 +158,42 @@
     opacity: 0.85;
   }
 
-  /* Holographic Rotating ASCII Skull Background */
-  .skull-bg-container {
+  /* 3D Mathematical Rotating Skulls (Flanking Layout) */
+  .skull-container {
     position: fixed;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100vw;
-    height: 100vh;
+    transform: translateY(-50%);
+    z-index: 5; /* Layered in front of CRT filters, behind app-container */
     display: flex;
     justify-content: center;
     align-items: center;
     pointer-events: none;
-    z-index: 5; /* Positioned above background scanlines to ensure high visibility */
-    overflow: hidden;
-    perspective: 1200px;
-  }
-
-  .ascii-skull {
-    font-family: var(--font-mono);
-    font-size: clamp(6px, 1.2vw, 13px);
-    line-height: 1.12;
-    color: var(--color-neon-green);
-    animation: rotateSkull3D 24s infinite linear;
-    transform-style: preserve-3d;
-    text-align: center;
-    margin: 0;
     user-select: none;
   }
 
-  .matrix-line {
-    display: block;
-    white-space: nowrap;
-    text-align: center;
+  .left-skull {
+    left: 2rem;
   }
 
-  /* Matrix Characters Color Density Scaling */
-  .char-g {
+  .right-skull {
+    right: 2rem;
+  }
+
+  .skull-container pre {
+    font-family: var(--font-mono);
+    font-size: clamp(5.5px, 0.72vw, 9.5px); /* Tightly sized to fit desktop flanks */
+    line-height: 1.1;
     color: var(--color-neon-green);
-    opacity: 0.13; /* Faint background green */
-    text-shadow: 0 0 4px var(--color-neon-green-glow);
+    opacity: 0.28; /* Visibly glowing green text skull */
+    text-shadow: 0 0 8px var(--color-neon-green), 0 0 16px var(--color-neon-green-glow);
+    margin: 0;
+    pointer-events: none;
   }
 
-  .char-t {
-    color: oklch(50% 0.12 140);
-    opacity: 0.19; /* Muted transitional green */
-  }
-
-  .char-d {
-    color: oklch(20% 0.01 140); /* Extremely dark green, forming the negative skull shape */
-    opacity: 0.04;
-  }
-
-  .char-y {
-    color: #EAB308;
-    opacity: 0.35; /* Yellow highlight */
-    text-shadow: 0 0 6px rgba(234, 179, 8, 0.4);
-  }
-
-  .char-o {
-    color: oklch(62% 0.28 300);
-    opacity: 0.35; /* Neon Violet pupil highlights */
-    text-shadow: 0 0 6px rgba(168, 85, 247, 0.4);
-  }
-
-  .char-c {
-    color: var(--text-primary);
-    opacity: 0.35; /* Off-white bottom highlight */
-    text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
-  }
-
-  @keyframes rotateSkull3D {
-    0% {
-      transform: rotateY(0deg) rotateZ(0deg) scale(0.98);
-    }
-    50% {
-      transform: rotateY(180deg) rotateZ(4deg) scale(1.04);
-    }
-    100% {
-      transform: rotateY(360deg) rotateZ(0deg) scale(0.98);
+  /* Responsive styling to hide skulls on narrow viewports */
+  @media (max-width: 1280px) {
+    .skull-container {
+      display: none;
     }
   }
 

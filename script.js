@@ -3,7 +3,7 @@
 // ==========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  initMatrixSkull();
+  init3DSkulls();
   initProgressBar();
   initSystemClocks();
   initConsoleLogger();
@@ -11,156 +11,98 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * 1. DYNAMIC HOLOGRAPHIC MATRIX SKULL BACKGROUND
+ * 1. MATHEMATICAL 3D ROTATING SKULL GENERATOR (Flanking Sides)
  */
-const skullMatrix = [
-  "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
-  "mmmmmmmmmmmmmmmmmmmmmmmmmmpppppppppppppppppppppppppppppppppppppp",
-  "mmmmmmmmmmmmmmmmmmmmppppppddddddddddddddddddddddpppppppppppppppp",
-  "mmmmmmmmmmmmmmmmppppddddddddddddddddddddddddddddddppppppppcccccc",
-  "mmmmmmmmmmmmmmppddddddddddddddddddddddddddddddddddddppppcccccccc",
-  "mmmmmmmmmmmmppddddddddddddddddddddddddddddddddddddddddppcccccccc",
-  "mmmmmmmmmmppddddddddddddddddddddddddddddddddddddddddddddppcccccc",
-  "mmmmmmmmmpddddddddddddddddddddddddddddddddddddddddddddddddPccccc",
-  "mmmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddppccc",
-  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
-  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
-  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
-  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
-  "mmmmmmppdddddddyyyyyyyddddddddddddddddddyyyyyyydddddddddddddppcc",
-  "mmmmmmppddddddyyyyyyyyyddddddddddddddddyyyyyyyyyddddddddddddppcc",
-  "mmmmmmppddddddyy     yyddddddddddddddddyy     yyddddddddddddppcc",
-  "mmmmmmppddddddyy  o  yyddddddddddddddddyy  o  yyddddddddddddppcc",
-  "mmmmmmppddddddyy     yyddddddddddddddddyy     yyddddddddddddppcc",
-  "mmmmmmppddddddyyyyyyyyyddddddddddddddddyyyyyyyyyddddddddddddppcc",
-  "mmmmmmppdddddddyyyyyyyddddddddddddddddddyyyyyyydddddddddddddppcc",
-  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
-  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
-  "mmmmmmmppddddddddddddddddddddddooddddddddddddddddddddddddddppccc",
-  "mmmmmmmppdddddddddddddddddddddoooodddddddddddddddddddddddddppccc",
-  "mmmmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddppcccc",
-  "mmmmmmmmmppddddddddddddddddddddddddddddddddddddddddddddddppccccc",
-  "mmmmmmmmmmppddddddddddddddddddddddddddddddddddddddddddddppcccccc",
-  "mmmmmmmmmmmppddddddddddddddddddddddddddddddddddddddddddppccccccc",
-  "mmmmmmmmmmmmppddddddddddddddddddddddddddddddddddddddddppcccccccc",
-  "mmmmmmmmmmmmmppddddddddddddddddddddddddddddddddddddddppccccccccc",
-  "mmmmmmmmmmmmmmppddddddddddddddddddddddddddddddddddddppcccccccccc",
-  "mmmmmmmmmmmmmmmppddddddddddddddddddddddddddddddddddppccccccccccc",
-  "mmmmmmmmmmmmmmmmppddddddddddddddddddddddddddddddddppcccccccccccc",
-  "mmmmmmmmmmmmmmmmmppddddddddddddddddddddddddddddddppccccccccccccc",
-  "mmmmmmmmmmmmmmmmmmppdddddyyyddddyyyyydddddddddddppcccccccccccccc",
-  "mmmmmmmmmmmmmmmmmmmppddddyyyddddyyyddddddddddddppccccccccccccc",
-  "mmmmmmmmmmmmmmmmmmmmppdddyyyddddyyydddddddddddppcccccccccccc",
-  "mmmmmmmmmmmmmmmmcccccppddddddddddddddddddddddppcccccccccccc",
-  "mmmmmmmmmmmmccccccccccppppppppppppppppppppppppccccccccccccc"
-];
+function init3DSkulls() {
+  const preLeft = document.getElementById('ascii-art-left');
+  const preRight = document.getElementById('ascii-art-right');
+  if (!preLeft && !preRight) return;
 
-function initMatrixSkull() {
-  const container = document.getElementById('ascii-skull');
-  if (!container) return;
-
-  const charSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%&*+=:;.";
-  let displayRows = [];
-
-  function buildGrid() {
-    container.innerHTML = '';
-    displayRows = [];
-
-    // Calculate how many characters are needed to fill the screen width
-    const charWidth = 8.5; // average width in pixels for JetBrains Mono at 13px
-    const colsToFill = Math.ceil(window.innerWidth / charWidth);
-    const skullWidth = skullMatrix[0].length;
-    const paddingSize = Math.max(0, Math.floor((colsToFill - skullWidth) / 2));
-
-    skullMatrix.forEach((row, rowIndex) => {
-      const lineEl = document.createElement('div');
-      lineEl.className = 'matrix-line';
-      const cellSpans = [];
-
-      // Helper to add characters
-      function addChar(type) {
-        const span = document.createElement('span');
-        let char = 'm';
-        
-        if (type === 'm') {
-          span.className = 'char-g';
-        } else if (type === 'p') {
-          span.className = 'char-t';
-          char = charSet[Math.floor(Math.random() * charSet.length)];
-        } else if (type === 'd') {
-          span.className = 'char-d';
-          char = charSet[Math.floor(Math.random() * charSet.length)];
-        } else if (type === 'y') {
-          span.className = 'char-y';
-          char = charSet[Math.floor(Math.random() * charSet.length)];
-        } else if (type === 'o') {
-          span.className = 'char-o';
-          char = charSet[Math.floor(Math.random() * charSet.length)];
-        } else if (type === 'c') {
-          span.className = 'char-c';
-          char = charSet[Math.floor(Math.random() * charSet.length)];
-        } else if (type === ' ') {
-          span.innerHTML = '&nbsp;';
-          lineEl.appendChild(span);
-          cellSpans.push({ span, type: ' ', char: ' ' });
-          return;
-        }
-
-        span.innerText = char;
-        lineEl.appendChild(span);
-        cellSpans.push({ span, type, char });
-      }
-
-      // Prepend padding
-      for (let i = 0; i < paddingSize; i++) {
-        addChar('m');
-      }
-
-      // Skull content
-      for (let i = 0; i < row.length; i++) {
-        addChar(row[i]);
-      }
-
-      // Append padding
-      for (let i = 0; i < paddingSize; i++) {
-        addChar('m');
-      }
-
-      container.appendChild(lineEl);
-      displayRows.push(cellSpans);
-    });
+  const points = [];
+  
+  // A. Generate 3D cranium dome
+  for (let theta = 0; theta < Math.PI * 2; theta += 0.1) {
+    for (let phi = 0; phi < Math.PI / 2; phi += 0.1) {
+      points.push({
+        x: Math.cos(theta) * Math.sin(phi) * 1.5,
+        y: -Math.cos(phi) * 1.5 - 0.3,
+        z: Math.sin(theta) * Math.sin(phi) * 1.5
+      });
+    }
   }
-
-  // Twinkle animation: randomly update a small fraction of characters
-  function twinkle() {
-    if (displayRows.length === 0) return;
-    
-    const tweakCount = Math.floor(displayRows.length * displayRows[0].length * 0.04);
-    for (let k = 0; k < tweakCount; k++) {
-      const r = Math.floor(Math.random() * displayRows.length);
-      const c = Math.floor(Math.random() * displayRows[0].length);
-      const cell = displayRows[r][c];
-
-      if (cell.type !== ' ' && cell.type !== 'm') {
-        const newChar = charSet[Math.floor(Math.random() * charSet.length)];
-        cell.span.innerText = newChar;
-        cell.char = newChar;
-      }
+  
+  // B. Generate jaw and cheekbones (with hollow cheek, nose and eye cuts)
+  for (let x = -0.6; x <= 0.6; x += 0.1) {
+    for (let y = -0.3; y <= 0.8; y += 0.1) {
+      let z = Math.sqrt(Math.max(0, 1 - (x*x) - (y*y))) * 1.2;
+      if (y > 0.3 && Math.abs(x) > 0.4) continue; // Hollow cheeks
+      if (y > 0.1 && y < 0.3 && Math.abs(x) < 0.2) continue; // Nose hole
+      if (y > -0.4 && y < 0.0 && Math.abs(x) > 0.3 && Math.abs(x) < 0.7) continue; // Eye sockets
+      points.push({ x: x, y: y, z: z });
+      points.push({ x: x, y: y, z: -z });
     }
   }
 
-  // Generate on load
-  buildGrid();
+  let angleLeft = 0;
+  let angleRight = Math.PI; // Out of phase by 180 degrees
+  const width = 80;
+  const height = 45;
+  const chars = " .:-=+*#%@";
 
-  // Re-generate on resize to keep background filled
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(buildGrid, 250);
-  });
+  // Function to render a single frame of the 3D skull
+  function renderFrame(preElement, currentAngle) {
+    let screen = Array(width * height).fill(' ');
+    let zBuffer = Array(width * height).fill(-Infinity);
 
-  // Run the twinkling loops
-  setInterval(twinkle, 120);
+    for (let p of points) {
+      // Rotate around Y axis (horizontal rotation)
+      let x1 = p.x * Math.cos(currentAngle) - p.z * Math.sin(currentAngle);
+      let z1 = p.x * Math.sin(currentAngle) + p.z * Math.cos(currentAngle);
+      
+      // Rotate slightly around X axis (3D tilt)
+      let y2 = p.y * Math.cos(0.25) - z1 * Math.sin(0.25);
+      let z2 = p.y * Math.sin(0.25) + z1 * Math.cos(0.25);
+
+      // Perspective projection mapping 3D to 2D
+      let distance = 3.5;
+      let ooz = 1 / (distance - z2);
+      
+      // Horizontal scale multiplier 2.1 to compensate for terminal font height aspect ratios
+      let xp = Math.floor(width / 2 + (x1 * 33 * ooz * 2.1));
+      let yp = Math.floor(height / 2 + (y2 * 33 * ooz));
+
+      if (xp >= 0 && xp < width && yp >= 0 && yp < height) {
+        let idx = xp + yp * width;
+        // Compare current depth against Z-buffer (using corrected z2 variable)
+        if (z2 > zBuffer[idx]) {
+          zBuffer[idx] = z2;
+          // Calculate lighting based on Z depth
+          let luminanceIdx = Math.floor(((z2 + 1.5) / 3) * (chars.length - 1));
+          luminanceIdx = Math.max(0, Math.min(chars.length - 1, luminanceIdx));
+          screen[idx] = chars[luminanceIdx];
+        }
+      }
+    }
+
+    // Assemble screen buffer into a single text output
+    let output = "";
+    for (let i = 0; i < height; i++) {
+      output += screen.slice(i * width, (i + 1) * width).join('') + "\n";
+    }
+    preElement.textContent = output;
+  }
+
+  function renderLoop() {
+    angleLeft += 0.02; // Rotation speed for left skull
+    angleRight -= 0.02; // Rotate right skull in opposite direction
+
+    if (preLeft) renderFrame(preLeft, angleLeft);
+    if (preRight) renderFrame(preRight, angleRight);
+
+    requestAnimationFrame(renderLoop);
+  }
+
+  renderLoop();
 }
 
 /**
