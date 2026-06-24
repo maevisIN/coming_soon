@@ -39,28 +39,172 @@
   <div class="film-grain"></div>
   <div class="scanlines"></div>
 
+  <!-- Holographic Rotating ASCII Skull Background -->
+  <div class="skull-bg-container">
+    <pre class="ascii-skull">
+                  .ed####R####be.
+               .d###R"        "R###b.
+             .d###R"   .oooo.   "R###b.
+            .d###R    .d####b.    R###b.
+            d###R     d######b     R###b
+            d###R     Y######P     R###b
+            d###R      "R##R"      R###b
+            d###R                  R###b
+            "d###b   .o.    .o.   d###P"
+             "d###b  Y#P    Y#P  d###P"
+              "d###b.          .d###P"
+                "R###b..oooo..d###P"
+                 "R#########R###P"
+                   d###R####R###b
+                  d###R      R###b
+                  d###R      R###b
+                  "R##R______R##R"
+                    "RRRRRRRRRR"
+    </pre>
+  </div>
+
   <div class="app-container">
     
-    <!-- Top System Meta-Bar -->
-    <header class="system-header">
-      <div class="header-left">
-        <span class="brand-text">MAEVIS</span>
-        <span class="system-badge">[SYS.PORTAL.v2.026]</span>
+    <!-- Top System Header (Replicating Main Website's Navbar layout) -->
+    <header class="nav-header">
+      <!-- Top Meta Bar -->
+      <div class="system-meta-bar">
+        <span>[ SYSTEM PORTAL // BBN OPERATING UNIT v.2026 [RAAVH-74] ]</span>
+        <span class="status-channel">[ STATUS: ONLINE // SECURE CHANNEL ]</span>
       </div>
-      
-      <div class="header-center">
-        <span class="status-dot status-dot-active"></span>
-        <span class="connection-code">CONN::ACTIVE [RAAVH-74]</span>
-      </div>
-      
-      <div class="header-right">
-        <div id="clock-display" class="clock-display">
-          UTC: --:--:-- | LOC: --:--:--
+
+      <!-- Main Navbar Grid -->
+      <div class="navbar-grid">
+        
+        <!-- Left Column: Brand Logo Identity -->
+        <div class="navbar-logo-area" id="nav-logo-btn">
+          <img src="logo.png" alt="MAEVIS Logo" class="nav-logo">
         </div>
+
+        <!-- Center Column: Interactive Navigation Buttons -->
+        <div class="navbar-tabs-area">
+          <nav class="nav-tabs">
+            <button class="nav-tab-btn active" data-tab="HOME">
+              <span class="tab-label">HOME</span>
+              <span class="tab-sub">[ CHL::01 [RAAVH-H] ]</span>
+            </button>
+            <button class="nav-tab-btn" data-tab="SHOP">
+              <span class="tab-label">SHOP</span>
+              <span class="tab-sub">[ SEC::92 [RAAVH-S] ]</span>
+            </button>
+            <button class="nav-tab-btn" data-tab="FABRICATE">
+              <span class="tab-label">FABRICATE</span>
+              <span class="tab-sub">[ FBR::04 [RAAVH-F] ]</span>
+            </button>
+            <button class="nav-tab-btn" data-tab="BLOGS">
+              <span class="tab-label">BLOGS</span>
+              <span class="tab-sub">[ LOG::0:92 [RAAVH-B] ]</span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- Right Column: Status & Security Graphics Panel -->
+        <div class="navbar-status-area">
+          <!-- Globe / Medallion -->
+          <div class="status-medallion">
+            <div class="radar-wrapper">
+              <svg class="radar-globe" viewBox="0 0 40 40" fill="none" stroke="currentColor">
+                <circle cx="20" cy="20" r="18" stroke-width="0.75" stroke-dasharray="2 2" opacity="0.3"/>
+                <circle cx="20" cy="20" r="14" stroke-width="1"/>
+                <path d="M20 2v36M2 20h36" stroke-width="0.75" opacity="0.6"/>
+                <path d="M7 20c0-7.18 5.82-13 13-13s13 5.82 13 13-5.82 13-13 13-13-5.82-13-13z" stroke-width="0.5" stroke-dasharray="1 1"/>
+                <circle cx="20" cy="20" r="6" stroke-width="1" class="pulse-circle"/>
+                <circle cx="20" cy="20" r="2" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="medallion-icons">
+              <span title="Thermal status">☼</span>
+              <span title="Base terminal">☖</span>
+              <span title="Radiation status">☣</span>
+            </div>
+          </div>
+
+          <!-- Mini Dot Status light column -->
+          <div class="status-lights">
+            <div class="light-row">
+              <span class="indicator-dot dot-green"></span>
+              <span class="light-label">SYS_A</span>
+            </div>
+            <div class="light-row">
+              <span class="indicator-dot dot-green"></span>
+              <span class="light-label">SYS_B</span>
+            </div>
+            <div class="light-row">
+              <span class="indicator-dot dot-yellow pulse-light"></span>
+              <span class="light-label">SYS_C</span>
+            </div>
+          </div>
+
+          <!-- Barcode & Mini QR Panel -->
+          <div class="status-barcode-qr">
+            <!-- Barcode SVG -->
+            <div class="barcode-wrapper">
+              <svg class="barcode-svg" viewBox="0 0 100 20" fill="currentColor">
+                <rect x="0" width="3" height="20" />
+                <rect x="5" width="1" height="20" />
+                <rect x="8" width="2" height="20" />
+                <rect x="12" width="4" height="20" />
+                <rect x="18" width="1" height="20" />
+                <rect x="21" width="3" height="20" />
+                <rect x="26" width="2" height="20" />
+                <rect x="30" width="1" height="20" />
+                <rect x="33" width="5" height="20" />
+                <rect x="40" width="2" height="20" />
+                <rect x="44" width="1" height="20" />
+                <rect x="47" width="3" height="20" />
+                <rect x="52" width="4" height="20" />
+                <rect x="58" width="1" height="20" />
+                <rect x="61" width="2" height="20" />
+                <rect x="65" width="2" height="20" />
+                <rect x="69" width="3" height="20" />
+                <rect x="74" width="1" height="20" />
+                <rect x="77" width="5" height="20" />
+                <rect x="84" width="2" height="20" />
+                <rect x="88" width="1" height="20" />
+                <rect x="91" width="3" height="20" />
+                <rect x="96" width="4" height="20" />
+              </svg>
+            </div>
+            <div class="qr-metadata">
+              <span class="id-label">ID: 41-04-26</span>
+              <div class="mini-qr-box">
+                <svg class="mini-qr-svg" viewBox="0 0 25 25" fill="currentColor">
+                  <rect x="0" y="0" width="7" height="7" />
+                  <rect x="1" y="1" width="5" height="5" fill="white" />
+                  <rect x="2" y="2" width="3" height="3" />
+                  
+                  <rect x="18" y="0" width="7" height="7" />
+                  <rect x="19" y="1" width="5" height="5" fill="white" />
+                  <rect x="20" y="2" width="3" height="3" />
+                  
+                  <rect x="0" y="18" width="7" height="7" />
+                  <rect x="1" y="19" width="5" height="5" fill="white" />
+                  <rect x="2" y="20" width="3" height="3" />
+                  
+                  <rect x="9" y="0" width="2" height="2" />
+                  <rect x="14" y="2" width="1" height="3" />
+                  <rect x="11" y="6" width="3" height="1" />
+                  <rect x="9" y="10" width="4" height="2" />
+                  <rect x="15" y="10" width="2" height="5" />
+                  <rect x="10" y="15" width="2" height="2" />
+                  <rect x="20" y="12" width="3" height="3" />
+                  <rect x="22" y="20" width="2" height="3" />
+                  <rect x="12" y="22" width="5" height="2" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </header>
 
-    <!-- Main Genesis Gateway Area -->
+    <!-- Main Content Area -->
     <main class="main-content">
       
       <section class="terminal-card">
@@ -72,7 +216,7 @@
         
         <!-- Window Title Bar -->
         <div class="terminal-window-bar">
-          <span class="window-title">[ GENESIS_GATEWAY_NODE ]</span>
+          <span class="window-title" id="gateway-node-title">[ GENESIS_GATEWAY_NODE ]</span>
           <div class="window-controls">
             <span class="ctrl-btn"></span>
             <span class="ctrl-btn"></span>
@@ -82,22 +226,17 @@
 
         <!-- Terminal Body -->
         <div class="terminal-body">
-          <!-- Logo Display -->
-          <div class="logo-container">
-            <img id="brand-logo" src="logo.png" alt="MAEVIS Logo" class="brand-logo">
-          </div>
 
           <!-- Main Brutalist Header -->
           <div class="title-section">
             <h1 class="genesis-title">BE PART OF OUR GENESIS</h1>
-            <p class="genesis-subtitle">SOL0425 // PORTAL CALIBRATION IN PROGRESS</p>
+            <p class="genesis-subtitle" id="node-subtitle-tag">SOL0425 // PORTAL CALIBRATION IN PROGRESS</p>
           </div>
-
 
           <!-- Progress Bar Overlay -->
           <div class="progress-container">
             <div class="progress-header">
-              <span class="progress-title">SYSTEM DECRYPTION STATUS</span>
+              <span class="progress-title" id="progress-bar-title">SYSTEM DECRYPTION STATUS</span>
               <span class="progress-pct" id="progress-percentage">84.2%</span>
             </div>
             <div class="progress-track">
@@ -108,7 +247,7 @@
           <!-- Simulated Console Logger -->
           <div class="console-logger">
             <div class="console-header">
-              <span>SYSTEM LOGS [RAAVH-SEC::92]</span>
+              <span id="console-node-label">SYSTEM LOGS [RAAVH-SEC::92]</span>
               <span class="console-pulse">LIVE</span>
             </div>
             <div class="console-output" id="console-output">

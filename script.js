@@ -7,11 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
   initSystemClocks();
   initConsoleLogger();
   initSubscriptionForm();
+  initNavbarInteractions();
 });
 
 /**
  * 1. DYNAMIC SYSTEM CALIBRATION PROGRESS BAR
  */
+let progressInterval = null;
 function initProgressBar() {
   const progressBarEl = document.getElementById('progress-bar');
   const progressPctEl = document.getElementById('progress-percentage');
@@ -27,11 +29,11 @@ function initProgressBar() {
     progressPctEl.innerText = formatted;
   }
   updateProgress();
-  setInterval(updateProgress, 1000);
+  progressInterval = setInterval(updateProgress, 1000);
 }
 
 /**
- * 2. LIVE SYSTEM TIME CLOCK
+ * 2. LIVE SYSTEM TIME CLOCK (UTC and Local side-by-side)
  */
 function initSystemClocks() {
   const clockEl = document.getElementById('clock-display');
@@ -60,28 +62,33 @@ function initSystemClocks() {
 /**
  * 3. SIMULATED SYSTEM LOG CONSOLE
  */
+let logInterval = null;
+const logDatabase = [
+  { type: 'info', text: 'SYSTEM REBOOT INITIATED ON GENESIS NODE [RAAVH-SEC::92]' },
+  { type: 'info', text: 'CALIBRATING CORE MEMORY ARRAYS...' },
+  { type: 'success', text: 'CORE SYSTEM MEMORY CALIBRATED.' },
+  { type: 'info', text: 'CONNECTING TO REMOTE SUITE WORKSHOPS...' },
+  { type: 'success', text: 'CONNECTION ESTABLISHED WITH WORKSHOP UNIT [WSH-01]' },
+  { type: 'info', text: 'FETCHING STAMP & SEAL LEDGER REGISTRY...' },
+  { type: 'warn', text: 'DETECTOR WARNING: VACUUM DOCK DUST FILTER LEVEL AT 12%' },
+  { type: 'success', text: 'VACUUM PACK INTEGRITY TEST: STABLE [0.98 bar]' },
+  { type: 'info', text: 'PARSING INVENTORY: SKIBIDI TOILET, BUTTERFLY KNIFE...' },
+  { type: 'success', text: 'INVENTORY READY FOR FABRICATION QUEUE.' },
+  { type: 'info', text: 'INJECTING RECENT LEDGER ENTRIES TO COLD ARCHIVE...' },
+  { type: 'success', text: 'ARCHIVE COMMITTED TO SECURE STORAGE.' },
+  { type: 'info', text: 'ESTABLISHING HANDSHAKE PING TO CLOUD NETWORK...' },
+  { type: 'success', text: 'PING ESTABLISHED [RTT 14ms]. DEPLOYMENT READY.' }
+];
+
+let currentLogIndex = 0;
+
 function initConsoleLogger() {
   const outputEl = document.getElementById('console-output');
   if (!outputEl) return;
 
-  const logDatabase = [
-    { type: 'info', text: 'SYSTEM REBOOT INITIATED ON GENESIS NODE [RAAVH-SEC::92]' },
-    { type: 'info', text: 'CALIBRATING CORE MEMORY ARRAYS...' },
-    { type: 'success', text: 'CORE SYSTEM MEMORY CALIBRATED.' },
-    { type: 'info', text: 'CONNECTING TO REMOTE SUITE WORKSHOPS...' },
-    { type: 'success', text: 'CONNECTION ESTABLISHED WITH WORKSHOP UNIT [WSH-01]' },
-    { type: 'info', text: 'FETCHING STAMP & SEAL LEDGER REGISTRY...' },
-    { type: 'warn', text: 'DETECTOR WARNING: VACUUM DOCK DUST FILTER LEVEL AT 12%' },
-    { type: 'success', text: 'VACUUM PACK INTEGRITY TEST: STABLE [0.98 bar]' },
-    { type: 'info', text: 'PARSING INVENTORY: SKIBIDI TOILET, BUTTERFLY KNIFE...' },
-    { type: 'success', text: 'INVENTORY READY FOR FABRICATION QUEUE.' },
-    { type: 'info', text: 'INJECTING RECENT LEDGER ENTRIES TO COLD ARCHIVE...' },
-    { type: 'success', text: 'ARCHIVE COMMITTED TO SECURE STORAGE.' },
-    { type: 'info', text: 'ESTABLISHING HANDSHAKE PING TO CLOUD NETWORK...' },
-    { type: 'success', text: 'PING ESTABLISHED [RTT 14ms]. DEPLOYMENT READY.' }
-  ];
-
-  let currentLogIndex = 0;
+  // Clear output on init
+  outputEl.innerHTML = '';
+  currentLogIndex = 0;
 
   function appendLog() {
     if (currentLogIndex >= logDatabase.length) {
@@ -99,21 +106,6 @@ function initConsoleLogger() {
     }
   }
 
-  function writeLogLine(type, text) {
-    const timestamp = new Date().toISOString().slice(11, 19);
-    const rowEl = document.createElement('div');
-    rowEl.className = `console-row ${type}`;
-    rowEl.innerHTML = `<span style="color: var(--text-tertiary)">[${timestamp}]</span> <span style="font-weight: 700;">&gt;</span> ${text}`;
-    
-    outputEl.appendChild(rowEl);
-    outputEl.scrollTop = outputEl.scrollHeight;
-
-    // Maintain a max line count to prevent lag
-    if (outputEl.children.length > 50) {
-      outputEl.removeChild(outputEl.firstChild);
-    }
-  }
-
   // Start fast and then trigger at normal pace
   appendLog();
   setTimeout(appendLog, 500);
@@ -121,7 +113,25 @@ function initConsoleLogger() {
   setTimeout(appendLog, 2000);
   
   // Set interval for ongoing logs
-  setInterval(appendLog, 4500);
+  logInterval = setInterval(appendLog, 4500);
+}
+
+function writeLogLine(type, text) {
+  const outputEl = document.getElementById('console-output');
+  if (!outputEl) return;
+
+  const timestamp = new Date().toISOString().slice(11, 19);
+  const rowEl = document.createElement('div');
+  rowEl.className = `console-row ${type}`;
+  rowEl.innerHTML = `<span style="color: var(--text-tertiary)">[${timestamp}]</span> <span style="font-weight: 700;">&gt;</span> ${text}`;
+  
+  outputEl.appendChild(rowEl);
+  outputEl.scrollTop = outputEl.scrollHeight;
+
+  // Maintain a max line count to prevent lag
+  if (outputEl.children.length > 50) {
+    outputEl.removeChild(outputEl.firstChild);
+  }
 }
 
 /**
@@ -158,13 +168,12 @@ function initSubscriptionForm() {
     responseEl.className = 'form-response';
     responseEl.innerText = 'UPLINK INITIATED. ENCRYPTING DATA PATH...';
 
-    // Simulate cybernetic registration stages
+    // Simulate registration stages
     setTimeout(() => {
       responseEl.innerText = 'GENERATING SECURE GENESIS AUTHENTICATOR...';
     }, 1000);
 
     setTimeout(() => {
-      // Create random access key
       const keyPart1 = Math.random().toString(36).substring(2, 6).toUpperCase();
       const keyPart2 = Math.random().toString(36).substring(2, 6).toUpperCase();
       const accessCode = `MVS-${keyPart1}-${keyPart2}`;
@@ -177,8 +186,6 @@ function initSubscriptionForm() {
 
       // Save to localstorage
       localStorage.setItem('maevis_enlistment', JSON.stringify(enlistmentDetails));
-      
-      // Update UI to success state
       displaySuccessState(enlistmentDetails);
     }, 2400);
   });
@@ -189,10 +196,8 @@ function initSubscriptionForm() {
   }
 
   function displaySuccessState(details) {
-    // Hide standard form elements
     formEl.style.display = 'none';
     
-    // Inject success content with terminal styling
     responseEl.className = 'form-response form-response-success';
     responseEl.innerHTML = `
       <div style="border: 1px solid var(--color-neon-green); padding: 1rem; border-radius: var(--radius-sm); text-align: left; background-color: var(--bg-primary);">
@@ -203,15 +208,100 @@ function initSubscriptionForm() {
       </div>
     `;
     
-    // Add custom logs into the console reflecting registration
-    const consoleOutput = document.getElementById('console-output');
-    if (consoleOutput) {
-      const timestamp = new Date().toISOString().slice(11, 19);
-      const regRow = document.createElement('div');
-      regRow.className = 'console-row success';
-      regRow.innerHTML = `<span style="color: var(--text-tertiary)">[${timestamp}]</span> <span style="font-weight: 700;">&gt;</span> CLIENT REGISTERED SECURELY. ACCESS KEY ENABLED.`;
-      consoleOutput.appendChild(regRow);
-      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    writeLogLine('success', 'CLIENT REGISTERED SECURELY. ACCESS KEY ENABLED.');
+  }
+}
+
+/**
+ * 5. NAVBAR INTERACTIVE TABS CONTROL
+ */
+function initNavbarInteractions() {
+  const tabs = document.querySelectorAll('.nav-tab-btn');
+  const logoBtn = document.getElementById('nav-logo-btn');
+  
+  const windowTitleEl = document.getElementById('gateway-node-title');
+  const subtitleTagEl = document.getElementById('node-subtitle-tag');
+  
+  const progressBarTitleEl = document.getElementById('progress-bar-title');
+  const progressBarEl = document.getElementById('progress-bar');
+  const progressPctEl = document.getElementById('progress-percentage');
+  const consoleNodeLabelEl = document.getElementById('console-node-label');
+
+  if (!tabs) return;
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabName = tab.getAttribute('data-tab');
+      
+      // Update active nav styles
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      handleTabSwitch(tabName);
+    });
+  });
+
+  if (logoBtn) {
+    logoBtn.addEventListener('click', () => {
+      // Clicking logo returns to HOME tab
+      tabs.forEach(t => {
+        if (t.getAttribute('data-tab') === 'HOME') {
+          t.click();
+        }
+      });
+    });
+  }
+
+  function handleTabSwitch(tabName) {
+    // Write routing log to the terminal console
+    writeLogLine('info', `ROUTING LINK TO TARGET CHANNEL: [${tabName}]`);
+    
+    if (tabName === 'HOME') {
+      // Restore Home state
+      if (windowTitleEl) windowTitleEl.innerText = '[ GENESIS_GATEWAY_NODE ]';
+      if (subtitleTagEl) subtitleTagEl.innerText = 'SOL0425 // PORTAL CALIBRATION IN PROGRESS';
+      if (progressBarTitleEl) progressBarTitleEl.innerText = 'SYSTEM DECRYPTION STATUS';
+      if (consoleNodeLabelEl) consoleNodeLabelEl.innerText = 'SYSTEM LOGS [RAAVH-SEC::92]';
+      
+      // Restart normal progress bar calibration
+      if (progressInterval) clearInterval(progressInterval);
+      initProgressBar();
+      
+      writeLogLine('success', 'LINK RESTORED. GENESIS SEQUENCE ONLINE.');
+    } else {
+      // Simulated connection offline redirection (similar to main React App's routing limits)
+      let sectionCode = '';
+      let subtagText = '';
+      
+      switch (tabName) {
+        case 'SHOP':
+          sectionCode = 'SEC_92_OFFLINE';
+          subtagText = 'SEC::92 // ACCESS DENIED';
+          break;
+        case 'FABRICATE':
+          sectionCode = 'FBR_04_OFFLINE';
+          subtagText = 'FBR::04 // ACCESS DENIED';
+          break;
+        case 'BLOGS':
+          sectionCode = 'LOG_0_92_OFFLINE';
+          subtagText = 'LOG::0:92 // ACCESS DENIED';
+          break;
+      }
+      
+      // Change card title to offline alert
+      if (windowTitleEl) windowTitleEl.innerText = `[ ${sectionCode} ]`;
+      if (subtitleTagEl) subtitleTagEl.innerText = subtagText;
+      if (progressBarTitleEl) progressBarTitleEl.innerText = 'CHANNEL PING ATTEMPT';
+      if (consoleNodeLabelEl) consoleNodeLabelEl.innerText = `DIAGNOSTICS LOGGER [${tabName}]`;
+      
+      // Set progress bar to 0% to represent disconnected channel
+      if (progressInterval) clearInterval(progressInterval);
+      if (progressBarEl) progressBarEl.style.width = '0%';
+      if (progressPctEl) progressPctEl.innerText = '0.0000% [OFFLINE]';
+      
+      writeLogLine('error', `ERR_CONN_REFUSED: Requested channel [${tabName}] is currently offline.`);
+      writeLogLine('warn', 'REASON: External node requires secure genesis access key credentials.');
+      writeLogLine('info', 'SUGGESTION: Input credential email in enlistment box to calibrate uplink.');
     }
   }
 }
