@@ -3,6 +3,7 @@
 // ==========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  initMatrixSkull();
   initProgressBar();
   initSystemClocks();
   initConsoleLogger();
@@ -10,7 +11,160 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * 1. DYNAMIC SYSTEM CALIBRATION PROGRESS BAR
+ * 1. DYNAMIC HOLOGRAPHIC MATRIX SKULL BACKGROUND
+ */
+const skullMatrix = [
+  "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+  "mmmmmmmmmmmmmmmmmmmmmmmmmmpppppppppppppppppppppppppppppppppppppp",
+  "mmmmmmmmmmmmmmmmmmmmppppppddddddddddddddddddddddpppppppppppppppp",
+  "mmmmmmmmmmmmmmmmppppddddddddddddddddddddddddddddddppppppppcccccc",
+  "mmmmmmmmmmmmmmppddddddddddddddddddddddddddddddddddddppppcccccccc",
+  "mmmmmmmmmmmmppddddddddddddddddddddddddddddddddddddddddppcccccccc",
+  "mmmmmmmmmmppddddddddddddddddddddddddddddddddddddddddddddppcccccc",
+  "mmmmmmmmmpddddddddddddddddddddddddddddddddddddddddddddddddPccccc",
+  "mmmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddppccc",
+  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
+  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
+  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
+  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
+  "mmmmmmppdddddddyyyyyyyddddddddddddddddddyyyyyyydddddddddddddppcc",
+  "mmmmmmppddddddyyyyyyyyyddddddddddddddddyyyyyyyyyddddddddddddppcc",
+  "mmmmmmppddddddyy     yyddddddddddddddddyy     yyddddddddddddppcc",
+  "mmmmmmppddddddyy  o  yyddddddddddddddddyy  o  yyddddddddddddppcc",
+  "mmmmmmppddddddyy     yyddddddddddddddddyy     yyddddddddddddppcc",
+  "mmmmmmppddddddyyyyyyyyyddddddddddddddddyyyyyyyyyddddddddddddppcc",
+  "mmmmmmppdddddddyyyyyyyddddddddddddddddddyyyyyyydddddddddddddppcc",
+  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
+  "mmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddddddppcc",
+  "mmmmmmmppddddddddddddddddddddddooddddddddddddddddddddddddddppccc",
+  "mmmmmmmppdddddddddddddddddddddoooodddddddddddddddddddddddddppccc",
+  "mmmmmmmmppddddddddddddddddddddddddddddddddddddddddddddddddppcccc",
+  "mmmmmmmmmppddddddddddddddddddddddddddddddddddddddddddddddppccccc",
+  "mmmmmmmmmmppddddddddddddddddddddddddddddddddddddddddddddppcccccc",
+  "mmmmmmmmmmmppddddddddddddddddddddddddddddddddddddddddddppccccccc",
+  "mmmmmmmmmmmmppddddddddddddddddddddddddddddddddddddddddppcccccccc",
+  "mmmmmmmmmmmmmppddddddddddddddddddddddddddddddddddddddppccccccccc",
+  "mmmmmmmmmmmmmmppddddddddddddddddddddddddddddddddddddppcccccccccc",
+  "mmmmmmmmmmmmmmmppddddddddddddddddddddddddddddddddddppccccccccccc",
+  "mmmmmmmmmmmmmmmmppddddddddddddddddddddddddddddddddppcccccccccccc",
+  "mmmmmmmmmmmmmmmmmppddddddddddddddddddddddddddddddppccccccccccccc",
+  "mmmmmmmmmmmmmmmmmmppdddddyyyddddyyyyydddddddddddppcccccccccccccc",
+  "mmmmmmmmmmmmmmmmmmmppddddyyyddddyyyddddddddddddppccccccccccccc",
+  "mmmmmmmmmmmmmmmmmmmmppdddyyyddddyyydddddddddddppcccccccccccc",
+  "mmmmmmmmmmmmmmmmcccccppddddddddddddddddddddddppcccccccccccc",
+  "mmmmmmmmmmmmccccccccccppppppppppppppppppppppppccccccccccccc"
+];
+
+function initMatrixSkull() {
+  const container = document.getElementById('ascii-skull');
+  if (!container) return;
+
+  const charSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%&*+=:;.";
+  let displayRows = [];
+
+  function buildGrid() {
+    container.innerHTML = '';
+    displayRows = [];
+
+    // Calculate how many characters are needed to fill the screen width
+    const charWidth = 8.5; // average width in pixels for JetBrains Mono at 13px
+    const colsToFill = Math.ceil(window.innerWidth / charWidth);
+    const skullWidth = skullMatrix[0].length;
+    const paddingSize = Math.max(0, Math.floor((colsToFill - skullWidth) / 2));
+
+    skullMatrix.forEach((row, rowIndex) => {
+      const lineEl = document.createElement('div');
+      lineEl.className = 'matrix-line';
+      const cellSpans = [];
+
+      // Helper to add characters
+      function addChar(type) {
+        const span = document.createElement('span');
+        let char = 'm';
+        
+        if (type === 'm') {
+          span.className = 'char-g';
+        } else if (type === 'p') {
+          span.className = 'char-t';
+          char = charSet[Math.floor(Math.random() * charSet.length)];
+        } else if (type === 'd') {
+          span.className = 'char-d';
+          char = charSet[Math.floor(Math.random() * charSet.length)];
+        } else if (type === 'y') {
+          span.className = 'char-y';
+          char = charSet[Math.floor(Math.random() * charSet.length)];
+        } else if (type === 'o') {
+          span.className = 'char-o';
+          char = charSet[Math.floor(Math.random() * charSet.length)];
+        } else if (type === 'c') {
+          span.className = 'char-c';
+          char = charSet[Math.floor(Math.random() * charSet.length)];
+        } else if (type === ' ') {
+          span.innerHTML = '&nbsp;';
+          lineEl.appendChild(span);
+          cellSpans.push({ span, type: ' ', char: ' ' });
+          return;
+        }
+
+        span.innerText = char;
+        lineEl.appendChild(span);
+        cellSpans.push({ span, type, char });
+      }
+
+      // Prepend padding
+      for (let i = 0; i < paddingSize; i++) {
+        addChar('m');
+      }
+
+      // Skull content
+      for (let i = 0; i < row.length; i++) {
+        addChar(row[i]);
+      }
+
+      // Append padding
+      for (let i = 0; i < paddingSize; i++) {
+        addChar('m');
+      }
+
+      container.appendChild(lineEl);
+      displayRows.push(cellSpans);
+    });
+  }
+
+  // Twinkle animation: randomly update a small fraction of characters
+  function twinkle() {
+    if (displayRows.length === 0) return;
+    
+    const tweakCount = Math.floor(displayRows.length * displayRows[0].length * 0.04);
+    for (let k = 0; k < tweakCount; k++) {
+      const r = Math.floor(Math.random() * displayRows.length);
+      const c = Math.floor(Math.random() * displayRows[0].length);
+      const cell = displayRows[r][c];
+
+      if (cell.type !== ' ' && cell.type !== 'm') {
+        const newChar = charSet[Math.floor(Math.random() * charSet.length)];
+        cell.span.innerText = newChar;
+        cell.char = newChar;
+      }
+    }
+  }
+
+  // Generate on load
+  buildGrid();
+
+  // Re-generate on resize to keep background filled
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(buildGrid, 250);
+  });
+
+  // Run the twinkling loops
+  setInterval(twinkle, 120);
+}
+
+/**
+ * 2. DYNAMIC SYSTEM CALIBRATION PROGRESS BAR
  */
 function initProgressBar() {
   const progressBarEl = document.getElementById('progress-bar');
@@ -20,7 +174,6 @@ function initProgressBar() {
   function updateProgress() {
     const now = new Date();
     const secs = now.getSeconds() + now.getMilliseconds() / 1000;
-    // Creep the progress bar between 84.20% and 84.35% dynamically based on the current minute's seconds
     const pct = 84.2 + (secs / 60) * 0.15;
     const formatted = pct.toFixed(4) + '%';
     progressBarEl.style.width = formatted;
@@ -31,7 +184,7 @@ function initProgressBar() {
 }
 
 /**
- * 2. LIVE SYSTEM TIME CLOCK (UTC and Local side-by-side)
+ * 3. LIVE SYSTEM TIME CLOCK (UTC and Local side-by-side)
  */
 function initSystemClocks() {
   const clockEl = document.getElementById('clock-display');
@@ -58,7 +211,7 @@ function initSystemClocks() {
 }
 
 /**
- * 3. SIMULATED SYSTEM LOG CONSOLE
+ * 4. SIMULATED SYSTEM LOG CONSOLE
  */
 const logDatabase = [
   { type: 'info', text: 'SYSTEM REBOOT INITIATED ON GENESIS NODE [RAAVH-SEC::92]' },
@@ -85,7 +238,6 @@ function initConsoleLogger() {
 
   function appendLog() {
     if (currentLogIndex >= logDatabase.length) {
-      // Loop logs or output idle ping status to keep console active
       const pingLogs = [
         { type: 'info', text: `CONN PING STATUS: STABLE [LATENCY ${Math.floor(Math.random() * 8) + 12}ms]` },
         { type: 'success', text: `HEALTH CHECK: NODE ONLINE [TEMP: -8.${Math.floor(Math.random() * 5) + 7}°C]` }
@@ -105,7 +257,6 @@ function initConsoleLogger() {
   setTimeout(appendLog, 1200);
   setTimeout(appendLog, 2000);
   
-  // Set interval for ongoing logs
   setInterval(appendLog, 4500);
 }
 
@@ -121,14 +272,13 @@ function writeLogLine(type, text) {
   outputEl.appendChild(rowEl);
   outputEl.scrollTop = outputEl.scrollHeight;
 
-  // Maintain a max line count to prevent lag
   if (outputEl.children.length > 50) {
     outputEl.removeChild(outputEl.firstChild);
   }
 }
 
 /**
- * 4. INTERACTIVE EMAIL NEWSLETTER FORM
+ * 5. INTERACTIVE EMAIL NEWSLETTER FORM
  */
 function initSubscriptionForm() {
   const formEl = document.getElementById('subscribe-form');
@@ -138,7 +288,6 @@ function initSubscriptionForm() {
 
   if (!formEl || !inputEl || !submitBtn || !responseEl) return;
 
-  // Check if they are already enlisted in localStorage
   const savedEnlistment = localStorage.getItem('maevis_enlistment');
   if (savedEnlistment) {
     displaySuccessState(JSON.parse(savedEnlistment));
@@ -154,7 +303,6 @@ function initSubscriptionForm() {
       return;
     }
 
-    // Disable input and button during submission simulation
     inputEl.disabled = true;
     submitBtn.disabled = true;
     submitBtn.innerText = '[ TRANSMITTING... ]';
@@ -176,7 +324,6 @@ function initSubscriptionForm() {
     })
     .then(res => res.json())
     .then(data => {
-      // Log successful backend transmission in local system logs
       writeLogLine('success', 'MAIL LINK FORWARDED TO GATEWAY SECURELY.');
     })
     .catch(err => {
@@ -184,13 +331,11 @@ function initSubscriptionForm() {
       writeLogLine('warn', 'MAIL UPLINK OFFLINE. LOCAL ENLISTMENT SAVED.');
     });
 
-    // Simulate cybernetic registration stages concurrently
     setTimeout(() => {
       responseEl.innerText = 'GENERATING SECURE GENESIS AUTHENTICATOR...';
     }, 1000);
 
     setTimeout(() => {
-      // Create random access key
       const keyPart1 = Math.random().toString(36).substring(2, 6).toUpperCase();
       const keyPart2 = Math.random().toString(36).substring(2, 6).toUpperCase();
       const accessCode = `MVS-${keyPart1}-${keyPart2}`;
@@ -201,7 +346,6 @@ function initSubscriptionForm() {
         timestamp: new Date().toISOString()
       };
 
-      // Save to localstorage
       localStorage.setItem('maevis_enlistment', JSON.stringify(enlistmentDetails));
       displaySuccessState(enlistmentDetails);
     }, 2400);
@@ -213,10 +357,8 @@ function initSubscriptionForm() {
   }
 
   function displaySuccessState(details) {
-    // Hide standard form elements
     formEl.style.display = 'none';
     
-    // Inject success content with terminal styling
     responseEl.className = 'form-response form-response-success';
     responseEl.innerHTML = `
       <div style="border: 1px solid var(--color-neon-green); padding: 1rem; border-radius: var(--radius-sm); text-align: left; background-color: var(--bg-primary);">

@@ -177,15 +177,55 @@
 
   .ascii-skull {
     font-family: var(--font-mono);
-    font-size: clamp(8px, 1.8vw, 16px);
-    line-height: 1.15;
+    font-size: clamp(6px, 1.2vw, 13px);
+    line-height: 1.12;
     color: var(--color-neon-green);
-    opacity: 0.22; /* Increased opacity for clear visibility while remaining a background element */
-    text-shadow: 0 0 10px var(--color-neon-green), 0 0 20px var(--color-neon-green-glow);
     animation: rotateSkull3D 24s infinite linear;
     transform-style: preserve-3d;
     text-align: center;
     margin: 0;
+    user-select: none;
+  }
+
+  .matrix-line {
+    display: block;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  /* Matrix Characters Color Density Scaling */
+  .char-g {
+    color: var(--color-neon-green);
+    opacity: 0.13; /* Faint background green */
+    text-shadow: 0 0 4px var(--color-neon-green-glow);
+  }
+
+  .char-t {
+    color: oklch(50% 0.12 140);
+    opacity: 0.19; /* Muted transitional green */
+  }
+
+  .char-d {
+    color: oklch(20% 0.01 140); /* Extremely dark green, forming the negative skull shape */
+    opacity: 0.04;
+  }
+
+  .char-y {
+    color: #EAB308;
+    opacity: 0.35; /* Yellow highlight */
+    text-shadow: 0 0 6px rgba(234, 179, 8, 0.4);
+  }
+
+  .char-o {
+    color: oklch(62% 0.28 300);
+    opacity: 0.35; /* Neon Violet pupil highlights */
+    text-shadow: 0 0 6px rgba(168, 85, 247, 0.4);
+  }
+
+  .char-c {
+    color: var(--text-primary);
+    opacity: 0.35; /* Off-white bottom highlight */
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
   }
 
   @keyframes rotateSkull3D {
