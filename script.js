@@ -161,7 +161,30 @@ function initSubscriptionForm() {
     responseEl.className = 'form-response';
     responseEl.innerText = 'UPLINK INITIATED. ENCRYPTING DATA PATH...';
 
-    // Simulate cybernetic registration stages
+    // Dispatch email to Formsubmit.co asynchronously
+    fetch("https://formsubmit.co/ajax/maevis1807@gmail.com", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        email: email,
+        _subject: "MAEVIS Portal - New Enlistment Request",
+        message: `Subscriber ${email} has requested early genesis portal access.`
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      // Log successful backend transmission in local system logs
+      writeLogLine('success', 'MAIL LINK FORWARDED TO GATEWAY SECURELY.');
+    })
+    .catch(err => {
+      console.error("Mail linkage error:", err);
+      writeLogLine('warn', 'MAIL UPLINK OFFLINE. LOCAL ENLISTMENT SAVED.');
+    });
+
+    // Simulate cybernetic registration stages concurrently
     setTimeout(() => {
       responseEl.innerText = 'GENERATING SECURE GENESIS AUTHENTICATOR...';
     }, 1000);
