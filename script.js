@@ -3,67 +3,31 @@
 // ==========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  initCountdown();
+  initProgressBar();
   initSystemClocks();
   initConsoleLogger();
   initSubscriptionForm();
 });
 
 /**
- * 1. HIGH-PRECISION COUNTDOWN
+ * 1. DYNAMIC SYSTEM CALIBRATION PROGRESS BAR
  */
-function initCountdown() {
-  // Set launch target to August 8, 2026 00:00:00 UTC
-  const launchTarget = new Date('2026-08-08T00:00:00Z').getTime();
-
-  const daysEl = document.getElementById('days');
-  const hoursEl = document.getElementById('hours');
-  const minutesEl = document.getElementById('minutes');
-  const secondsEl = document.getElementById('seconds');
+function initProgressBar() {
   const progressBarEl = document.getElementById('progress-bar');
   const progressPctEl = document.getElementById('progress-percentage');
+  if (!progressBarEl || !progressPctEl) return;
 
-  function updateTimer() {
-    const now = new Date().getTime();
-    const distance = launchTarget - now;
-
-    if (distance < 0) {
-      // Launch target reached
-      if (daysEl) daysEl.innerText = '00';
-      if (hoursEl) hoursEl.innerText = '00';
-      if (minutesEl) minutesEl.innerText = '00';
-      if (secondsEl) secondsEl.innerText = '00';
-      if (progressBarEl) progressBarEl.style.width = '100%';
-      if (progressPctEl) progressPctEl.innerText = '100.0% [LAUNCHED]';
-      return;
-    }
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    // Format with leading zeros
-    if (daysEl) daysEl.innerText = String(days).padStart(2, '0');
-    if (hoursEl) hoursEl.innerText = String(hours).padStart(2, '0');
-    if (minutesEl) minutesEl.innerText = String(minutes).padStart(2, '0');
-    if (secondsEl) secondsEl.innerText = String(seconds).padStart(2, '0');
-
-    // Dynamically calculate progress bar percent (starting from 84.2% on June 24, 2026, creeping up to 99% close to launch)
-    const totalDuration = launchTarget - new Date('2026-06-24T00:00:00Z').getTime();
-    const elapsed = now - new Date('2026-06-24T00:00:00Z').getTime();
-    let percentage = 84.2 + (elapsed / totalDuration) * 15.8;
-    if (percentage > 99.9) percentage = 99.9;
-    if (percentage < 84.2) percentage = 84.2;
-
-    const formattedPercentage = percentage.toFixed(4) + '%';
-    if (progressBarEl) progressBarEl.style.width = formattedPercentage;
-    if (progressPctEl) progressPctEl.innerText = formattedPercentage;
+  function updateProgress() {
+    const now = new Date();
+    const secs = now.getSeconds() + now.getMilliseconds() / 1000;
+    // Creep the progress bar between 84.20% and 84.35% dynamically based on the current minute's seconds
+    const pct = 84.2 + (secs / 60) * 0.15;
+    const formatted = pct.toFixed(4) + '%';
+    progressBarEl.style.width = formatted;
+    progressPctEl.innerText = formatted;
   }
-
-  // Initial call and set interval
-  updateTimer();
-  setInterval(updateTimer, 1000);
+  updateProgress();
+  setInterval(updateProgress, 1000);
 }
 
 /**

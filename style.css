@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;1,700&family=Inter:wght@400;500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@500;700;800&display=swap');
+
 /* ==========================================================================
    MAEVIS GENESIS PORTAL - STYLESHEET
    ========================================================================== */
@@ -103,6 +105,8 @@
   .app-container {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
     padding: 1.5rem;
     position: relative;
@@ -156,16 +160,20 @@
 
   /* Top Navigation & Status Bar */
   .system-header {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-subtle);
     padding-bottom: 1rem;
-    margin-bottom: 2rem;
     font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--text-tertiary);
     letter-spacing: 0.05em;
+    z-index: 20;
   }
 
   .header-left {
@@ -219,11 +227,13 @@
 
   /* Main Central Section */
   .main-content {
-    flex-grow: 1;
+    width: 100%;
+    max-width: 680px;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-block: 1.5rem;
+    padding-block: 4rem;
+    margin-block: auto;
   }
 
   /* Cyberpunk Modular Card Container */
@@ -591,16 +601,20 @@
 
   /* Footer Section */
   .system-footer {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     align-items: center;
     border-top: 1px solid var(--border-subtle);
     padding-top: 1.5rem;
-    margin-top: 2rem;
     font-family: var(--font-mono);
     font-size: 0.7rem;
     color: var(--text-tertiary);
+    z-index: 20;
   }
 
   @media (min-width: 768px) {
@@ -678,5 +692,35 @@
     transition-duration: 0s !important;
     scroll-behavior: auto !important;
     transform: none !important;
+  }
+}
+
+/* Responsive heights and mobile views to prevent absolute overlap */
+@media (max-height: 720px), (max-width: 768px) {
+  .app-container {
+    justify-content: flex-start;
+    padding-top: 5rem;
+    padding-bottom: 2rem;
+  }
+  .system-header {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    padding-bottom: 0.5rem;
+  }
+  .system-footer {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    margin-top: 2rem;
+    width: 100%;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .main-content {
+    padding-block: 1rem;
+    margin-block: 0;
   }
 }
