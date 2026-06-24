@@ -1,3 +1,4 @@
+
 # MAEVIS Coming Soon Page
 
 A highly polished, responsive, and cybernetic-themed static "Coming Soon" page for `maevis.in`. Designed to match the OKLCH-based theme surfaces, modern typography (Space Grotesk, Barlow Condensed, JetBrains Mono), CRT scanlines, and animated widgets of the main website.
