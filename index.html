@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAEVIS | Genesis System Portal</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="MAEVIS represents SOL0425: Small batch 3D prints, vacuum-sealed and hand-numbered. System Portal coming soon. Be part of our genesis.">
+  <meta name="keywords" content="maevis, 3d prints, vacuum-sealed, custom fabrication, genesis portal, cyberpunk, design portal">
+  <meta name="author" content="MAEVIS">
+  
+  <!-- OpenGraph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="MAEVIS | Genesis System Portal">
+  <meta property="og:description" content="Small batch 3D prints, vacuum-sealed and hand-numbered. System Portal coming soon. Be part of our genesis.">
+  <meta property="og:image" content="logo.png">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="MAEVIS | Genesis System Portal">
+  <meta property="twitter:description" content="Small batch 3D prints, vacuum-sealed and hand-numbered. System Portal coming soon. Be part of our genesis.">
+  <meta property="twitter:image" content="logo.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;1,700&family=Inter:wght@400;500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="halftone-texture">
+  
+  <!-- CRT Screen Glitch Effects -->
+  <div class="film-grain"></div>
+  <div class="scanlines"></div>
+
+  <div class="app-container">
+    
+    <!-- Top System Meta-Bar -->
+    <header class="system-header">
+      <div class="header-left">
+        <span class="brand-text">MAEVIS</span>
+        <span class="system-badge">[SYS.PORTAL.v2.026]</span>
+      </div>
+      
+      <div class="header-center">
+        <span class="status-dot status-dot-active"></span>
+        <span class="connection-code">CONN::ACTIVE [RAAVH-74]</span>
+      </div>
+      
+      <div class="header-right">
+        <div id="clock-display" class="clock-display">
+          UTC: --:--:-- | LOC: --:--:--
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Genesis Gateway Area -->
+    <main class="main-content">
+      
+      <section class="terminal-card">
+        <!-- Target Corner Decors -->
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+        
+        <!-- Window Title Bar -->
+        <div class="terminal-window-bar">
+          <span class="window-title">[ GENESIS_GATEWAY_NODE ]</span>
+          <div class="window-controls">
+            <span class="ctrl-btn"></span>
+            <span class="ctrl-btn"></span>
+            <span class="ctrl-btn"></span>
+          </div>
+        </div>
+
+        <!-- Terminal Body -->
+        <div class="terminal-body">
+          <!-- Logo Display -->
+          <div class="logo-container">
+            <img id="brand-logo" src="logo.png" alt="MAEVIS Logo" class="brand-logo">
+          </div>
+
+          <!-- Main Brutalist Header -->
+          <div class="title-section">
+            <h1 class="genesis-title">BE PART OF OUR GENESIS</h1>
+            <p class="genesis-subtitle">SOL0425 // PORTAL CALIBRATION IN PROGRESS</p>
+          </div>
+
+          <!-- High-Precision Ticking Countdown -->
+          <div class="countdown-grid" id="countdown-timer">
+            <div class="countdown-card">
+              <div class="countdown-num" id="days">--</div>
+              <div class="countdown-label">DAYS</div>
+            </div>
+            <div class="countdown-card">
+              <div class="countdown-num" id="hours">--</div>
+              <div class="countdown-label">HOURS</div>
+            </div>
+            <div class="countdown-card">
+              <div class="countdown-num" id="minutes">--</div>
+              <div class="countdown-label">MINUTES</div>
+            </div>
+            <div class="countdown-card">
+              <div class="countdown-num" id="seconds">--</div>
+              <div class="countdown-label">SECONDS</div>
+            </div>
+          </div>
+
+          <!-- Progress Bar Overlay -->
+          <div class="progress-container">
+            <div class="progress-header">
+              <span class="progress-title">SYSTEM DECRYPTION STATUS</span>
+              <span class="progress-pct" id="progress-percentage">84.2%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-bar" id="progress-bar" style="width: 84.2%;"></div>
+            </div>
+          </div>
+
+          <!-- Simulated Console Logger -->
+          <div class="console-logger">
+            <div class="console-header">
+              <span>SYSTEM LOGS [RAAVH-SEC::92]</span>
+              <span class="console-pulse">LIVE</span>
+            </div>
+            <div class="console-output" id="console-output">
+              <!-- Dynamically populated by script.js -->
+            </div>
+          </div>
+
+          <!-- Interactive Newsletter Form -->
+          <div class="form-container">
+            <h3 class="form-title">ENLIST FOR EARLY PORTAL ACCESS</h3>
+            <p class="form-desc">Provide your credentials to establish secure link and receive genesis tokens.</p>
+            
+            <form id="subscribe-form" class="subscribe-form">
+              <div class="input-group">
+                <span class="input-prefix">&gt;</span>
+                <input 
+                  type="email" 
+                  id="subscriber-email" 
+                  class="email-input" 
+                  placeholder="ENTER ACCESS EMAIL..." 
+                  required
+                >
+              </div>
+              <button type="submit" id="submit-btn" class="submit-button">
+                [ REQUEST UPLINK ]
+              </button>
+            </form>
+            <div id="form-response" class="form-response"></div>
+          </div>
+          
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer System Status Codes -->
+    <footer class="system-footer">
+      <div class="footer-left">
+        <span>© 2026 MAEVIS GBL SYSTEM PORTAL.</span>
+      </div>
+      
+      <div class="footer-center">
+        <span class="footer-tag">[ CHL::01 [RAAVH-H] ]</span>
+        <span class="footer-tag">[ SEC::92 [RAAVH-S] ]</span>
+        <span class="footer-tag">[ LOG::0:92 [RAAVH-B] ]</span>
+      </div>
+      
+      <div class="footer-right">
+        <div class="social-links">
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-capsule" id="github-link">
+            <span>GITHUB</span>
+          </a>
+          <a href="https://discord.gg" target="_blank" rel="noopener noreferrer" class="social-capsule" id="discord-link">
+            <span>DISCORD</span>
+          </a>
+          <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="social-capsule" id="twitter-link">
+            <span>X.COM</span>
+          </a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Custom Scripts -->
+  <script src="script.js"></script>
+</body>
+</html>
