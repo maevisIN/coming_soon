@@ -158,11 +158,10 @@
     opacity: 0.85;
   }
 
-  /* 3D Mathematical Rotating Skulls (Flanking Layout) */
+  /* 3D Mathematical Rotating Skull (Peeking Left Layout) */
   .skull-container {
     position: fixed;
     top: 50%;
-    transform: translateY(-50%);
     z-index: 5; /* Layered in front of CRT filters, behind app-container */
     display: flex;
     justify-content: center;
@@ -172,26 +171,25 @@
   }
 
   .left-skull {
-    left: 2rem;
-  }
-
-  .right-skull {
-    right: 2rem;
+    left: 50%;
+    transform: translate(-90%, -50%); /* Centers vertically and shifts left to peek behind the card */
   }
 
   .skull-container pre {
     font-family: var(--font-mono);
-    font-size: clamp(5.5px, 0.72vw, 9.5px); /* Tightly sized to fit desktop flanks */
-    line-height: 1.1;
+    font-size: clamp(6.5px, 0.85vw, 10.5px);
+    line-height: 8px; /* High fidelity spacing */
+    letter-spacing: 1px;
+    font-weight: bold;
     color: var(--color-neon-green);
-    opacity: 0.28; /* Visibly glowing green text skull */
-    text-shadow: 0 0 8px var(--color-neon-green), 0 0 16px var(--color-neon-green-glow);
+    opacity: 0.38; /* Visibly glowing green text skull */
+    text-shadow: 0 0 4px var(--color-neon-green), 0 0 12px var(--color-neon-green-glow);
     margin: 0;
     pointer-events: none;
   }
 
-  /* Responsive styling to hide skulls on narrow viewports */
-  @media (max-width: 1280px) {
+  /* Responsive styling to hide skull on narrow viewports */
+  @media (max-width: 1100px) {
     .skull-container {
       display: none;
     }

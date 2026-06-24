@@ -11,98 +11,108 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * 1. MATHEMATICAL 3D ROTATING SKULL GENERATOR (Flanking Sides)
+ * 1. MATHEMATICAL 3D MATRIX GLYPH SKULL (Single Left side peeking behind card)
  */
 function init3DSkulls() {
-  const preLeft = document.getElementById('ascii-art-left');
-  const preRight = document.getElementById('ascii-art-right');
-  if (!preLeft && !preRight) return;
+  const pre = document.getElementById('matrix-skull');
+  if (!pre) return;
 
+  // Matrix dynamic stream character library
+  const matrixChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@&%*=+[]{}/<>?;:".split('');
+  
+  // 3D Point cloud dataset specifically sculpted to model realistic skull cavities
   const points = [];
   
-  // A. Generate 3D cranium dome
-  for (let theta = 0; theta < Math.PI * 2; theta += 0.1) {
-    for (let phi = 0; phi < Math.PI / 2; phi += 0.1) {
+  // A. Cranium (Big upper back dome)
+  for (let i = 0; i < 600; i++) {
+      let theta = Math.random() * Math.PI * 2;
+      let phi = Math.random() * (Math.PI * 0.65);
       points.push({
-        x: Math.cos(theta) * Math.sin(phi) * 1.5,
-        y: -Math.cos(phi) * 1.5 - 0.3,
-        z: Math.sin(theta) * Math.sin(phi) * 1.5
+          x: Math.cos(theta) * Math.sin(phi) * 1.5,
+          y: -Math.cos(phi) * 1.3 - 0.4,
+          z: Math.sin(theta) * Math.sin(phi) * 1.5
       });
-    }
   }
   
-  // B. Generate jaw and cheekbones (with hollow cheek, nose and eye cuts)
-  for (let x = -0.6; x <= 0.6; x += 0.1) {
-    for (let y = -0.3; y <= 0.8; y += 0.1) {
-      let z = Math.sqrt(Math.max(0, 1 - (x*x) - (y*y))) * 1.2;
-      if (y > 0.3 && Math.abs(x) > 0.4) continue; // Hollow cheeks
-      if (y > 0.1 && y < 0.3 && Math.abs(x) < 0.2) continue; // Nose hole
-      if (y > -0.4 && y < 0.0 && Math.abs(x) > 0.3 && Math.abs(x) < 0.7) continue; // Eye sockets
+  // B. Face, Cheekbones & Nasal Cavity
+  for (let i = 0; i < 700; i++) {
+      let y = (Math.random() * 1.4) - 0.5; // Face range
+      let widthFactor = y < 0.2 ? 1.3 : 0.85; // Tapering down to the jaw
+      let rad = Math.sqrt(Math.max(0, 1 - (y * y))) * widthFactor;
+      let theta = (Math.random() * Math.PI * 0.8) - (Math.PI * 0.4); // Front face arc
+      
+      let x = Math.sin(theta) * rad;
+      let z = Math.cos(theta) * rad + 0.3; // Push forward
+
+      // Carve out deep eye sockets
+      if (y > -0.3 && y < 0.1 && Math.abs(x) > 0.3 && Math.abs(x) < 0.85) continue;
+      // Carve out the nasal cavity triangle
+      if (y > 0.1 && y < 0.4 && Math.abs(x) < (y - 0.1) * 0.9) continue;
+      // Carve out deep temple hollows
+      if (y > -0.5 && y < -0.1 && Math.abs(theta) > 0.8) continue;
+
       points.push({ x: x, y: y, z: z });
-      points.push({ x: x, y: y, z: -z });
-    }
+  }
+  
+  // C. Lower Teeth & Narrow Jaw Structure
+  for (let i = 0; i < 350; i++) {
+      let y = (Math.random() * 0.5) + 0.9;
+      let theta = (Math.random() * Math.PI * 0.5) - (Math.PI * 0.25);
+      let rad = 0.65 - (y * 0.1); 
+      points.push({
+          x: Math.sin(theta) * rad,
+          y: y,
+          z: Math.cos(theta) * rad + 0.4
+      });
   }
 
-  let angleLeft = 0;
-  let angleRight = Math.PI; // Out of phase by 180 degrees
-  const width = 80;
-  const height = 45;
-  const chars = " .:-=+*#%@";
+  let angle = 0;
+  const width = 100;
+  const height = 70;
 
-  // Function to render a single frame of the 3D skull
-  function renderFrame(preElement, currentAngle) {
-    let screen = Array(width * height).fill(' ');
-    let zBuffer = Array(width * height).fill(-Infinity);
+  // Refined Matrix Render Loop
+  function drawFrame() {
+      let screen = Array(width * height).fill(' ');
+      let zBuffer = Array(width * height).fill(-Infinity);
+      angle += 0.025; // Smooth rotation velocity
 
-    for (let p of points) {
-      // Rotate around Y axis (horizontal rotation)
-      let x1 = p.x * Math.cos(currentAngle) - p.z * Math.sin(currentAngle);
-      let z1 = p.x * Math.sin(currentAngle) + p.z * Math.cos(currentAngle);
-      
-      // Rotate slightly around X axis (3D tilt)
-      let y2 = p.y * Math.cos(0.25) - z1 * Math.sin(0.25);
-      let z2 = p.y * Math.sin(0.25) + z1 * Math.cos(0.25);
+      for (let p of points) {
+          // Y-Axis Spin Rotation Matrix
+          let x1 = p.x * Math.cos(angle) - p.z * Math.sin(angle);
+          let z1 = p.x * Math.sin(angle) + p.z * Math.cos(angle);
+          
+          // Static X-Axis tilt to match terminal perspective angles
+          let y2 = p.y * Math.cos(0.2) - z1 * Math.sin(0.2);
+          let z2 = p.y * Math.sin(0.2) + z1 * Math.cos(0.2);
 
-      // Perspective projection mapping 3D to 2D
-      let distance = 3.5;
-      let ooz = 1 / (distance - z2);
-      
-      // Horizontal scale multiplier 2.1 to compensate for terminal font height aspect ratios
-      let xp = Math.floor(width / 2 + (x1 * 33 * ooz * 2.1));
-      let yp = Math.floor(height / 2 + (y2 * 33 * ooz));
+          // Perspective multi-scale projection
+          let distance = 3.8;
+          let ooz = 1 / (distance - z2);
+          let xp = Math.floor(width / 2 + (x1 * 52 * ooz * 1.8)); 
+          let yp = Math.floor(height / 2 + (y2 * 52 * ooz));
 
-      if (xp >= 0 && xp < width && yp >= 0 && yp < height) {
-        let idx = xp + yp * width;
-        // Compare current depth against Z-buffer (using corrected z2 variable)
-        if (z2 > zBuffer[idx]) {
-          zBuffer[idx] = z2;
-          // Calculate lighting based on Z depth
-          let luminanceIdx = Math.floor(((z2 + 1.5) / 3) * (chars.length - 1));
-          luminanceIdx = Math.max(0, Math.min(chars.length - 1, luminanceIdx));
-          screen[idx] = chars[luminanceIdx];
-        }
+          if (xp >= 0 && xp < width && yp >= 0 && yp < height) {
+              let idx = xp + yp * width;
+              // Compare current depth (z2) with Z-buffer (using corrected z2 variable)
+              if (z2 > zBuffer[idx]) {
+                  zBuffer[idx] = z2;
+                  // Inject random matrix text glyph instead of a standard linear ramp
+                  screen[idx] = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+              }
+          }
       }
-    }
 
-    // Assemble screen buffer into a single text output
-    let output = "";
-    for (let i = 0; i < height; i++) {
-      output += screen.slice(i * width, (i + 1) * width).join('') + "\n";
-    }
-    preElement.textContent = output;
+      // Assemble line frames
+      let output = "";
+      for (let i = 0; i < height; i++) {
+          output += screen.slice(i * width, (i + 1) * width).join('') + "\n";
+      }
+      pre.textContent = output;
+
+      requestAnimationFrame(drawFrame);
   }
 
-  function renderLoop() {
-    angleLeft += 0.02; // Rotation speed for left skull
-    angleRight -= 0.02; // Rotate right skull in opposite direction
-
-    if (preLeft) renderFrame(preLeft, angleLeft);
-    if (preRight) renderFrame(preRight, angleRight);
-
-    requestAnimationFrame(renderLoop);
-  }
-
-  renderLoop();
+  drawFrame();
 }
 
 /**
@@ -156,7 +166,7 @@ function initSystemClocks() {
  * 4. SIMULATED SYSTEM LOG CONSOLE
  */
 const logDatabase = [
-  { type: 'info', text: 'SYSTEM REBOOT INITIATED ON GENESIS NODE [RAAVH-SEC::92]' },
+  { type: 'info', text: 'SYSTEM REBOOT IN INITIAL STAGE...' },
   { type: 'info', text: 'CALIBRATING CORE MEMORY ARRAYS...' },
   { type: 'success', text: 'CORE SYSTEM MEMORY CALIBRATED.' },
   { type: 'info', text: 'CONNECTING TO REMOTE SUITE WORKSHOPS...' },
