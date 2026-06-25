@@ -170,6 +170,9 @@ function init3DSkullCanvas() {
       const randPt = skullPoints[Math.floor(Math.random() * skullPoints.length)];
       const ptProj = getRotatedProjectedPoint(randPt, angleY, angleX);
       if (ptProj.z2 > 0) {
+        const displayWidth = canvas.clientWidth || 660;
+        const isMobileSize = displayWidth < 500;
+        const sizeMultiplier = isMobileSize ? 2.5 : 1.0;
         dissolutionParticles.push({
           x: ptProj.xp,
           y: ptProj.yp,
@@ -178,7 +181,7 @@ function init3DSkullCanvas() {
           alpha: 1.0,
           decay: 0.01 + Math.random() * 0.015,
           color: Math.random() > 0.5 ? 'rgba(236, 72, 153, ' : 'rgba(249, 115, 22, ',
-          size: Math.random() * 1.5 + 0.5
+          size: (Math.random() * 1.5 + 0.5) * sizeMultiplier
         });
       }
     }
@@ -221,6 +224,15 @@ function init3DSkullCanvas() {
   }
 
   function drawPoints(angY, angX, offsetOffsetX, offsetOffsetY, overrideColor) {
+    const displayWidth = canvas.clientWidth || 660;
+    const isMobileSize = displayWidth < 500;
+    
+    // Scale up dots and baseline alpha on mobile/small screens to compensate for canvas downscaling
+    const dotBase = isMobileSize ? 2.5 : 1.0;
+    const dotExtra = isMobileSize ? 3.0 : 1.5;
+    const alphaBase = isMobileSize ? 0.38 : 0.15;
+    const alphaExtra = isMobileSize ? 0.57 : 0.70;
+
     for (let p of skullPoints) {
       let pt = getRotatedProjectedPoint(p, angY, angX);
       let xp = pt.xp + offsetOffsetX;
@@ -238,11 +250,11 @@ function init3DSkullCanvas() {
           r = Math.round(236 + t * (249 - 236));
           g = Math.round(72 + t * (115 - 72));
           b = Math.round(153 + t * (22 - 153));
-          alpha = 0.15 + t * 0.7;
+          alpha = alphaBase + t * alphaExtra;
           ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         }
 
-        let dotSize = 1.0 + t * 1.5;
+        let dotSize = dotBase + t * dotExtra;
         ctx.fillRect(xp - dotSize/2, yp - dotSize/2, dotSize, dotSize);
       }
     }
@@ -252,7 +264,10 @@ function init3DSkullCanvas() {
     if (eye.z2 < -0.1) return; // behind head
     
     const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 250);
-    const radius = (7 + pulse * 5) * eye.ooz * 3.8;
+    const displayWidth = canvas.clientWidth || 660;
+    const isMobileSize = displayWidth < 500;
+    const glowMultiplier = isMobileSize ? 2.0 : 1.0;
+    const radius = (7 + pulse * 5) * eye.ooz * 3.8 * glowMultiplier;
     if (radius <= 0) return;
 
     const grad = ctx.createRadialGradient(eye.xp, eye.yp, 0, eye.xp, eye.yp, radius);
@@ -274,7 +289,7 @@ function init3DSkullCanvas() {
     // Core
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.beginPath();
-    ctx.arc(eye.xp, eye.yp, 1.2 * eye.ooz * 3.8, 0, Math.PI * 2);
+    ctx.arc(eye.xp, eye.yp, 1.2 * eye.ooz * 3.8 * glowMultiplier, 0, Math.PI * 2);
     ctx.fill();
   }
 
