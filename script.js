@@ -313,7 +313,7 @@ function initMouseParallax() {
     if (skullContainer) {
       const pX = currentTiltY * 25;
       const pY = currentTiltX * 25;
-      skullContainer.style.transform = `translate(calc(-92% + ${pX}px), calc(-50% + ${pY}px))`;
+      skullContainer.style.transform = `translate(calc(-180% + ${pX}px), calc(-50% + ${pY}px))`;
     }
 
     requestAnimationFrame(updateParallax);

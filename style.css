@@ -193,7 +193,7 @@
 
   .left-skull {
     left: 50%;
-    transform: translate(-92%, -50%); /* Shifts the skull to peek behind the card */
+    transform: translate(-180%, -50%); /* Shifts the skull fully to the left of the card */
   }
 
   #hologram-canvas {
