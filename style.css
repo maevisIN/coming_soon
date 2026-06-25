@@ -111,6 +111,7 @@
     padding: 1.5rem;
     position: relative;
     z-index: 10;
+    perspective: 1000px; /* 3D Tilt perspective context */
   }
 
   /* Halftone Texture Overlay */
@@ -123,7 +124,7 @@
     position: fixed;
     inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.05;
+    opacity: 0.04;
     mix-blend-mode: overlay;
     pointer-events: none;
     z-index: 2;
@@ -133,7 +134,7 @@
   .film-grain {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.45) 100%);
+    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
     pointer-events: none;
     z-index: 3;
   }
@@ -146,16 +147,36 @@
     background: linear-gradient(
       rgba(18, 16, 16, 0) 50%, 
       rgba(0, 0, 0, 0.25) 50%
-    ), linear-gradient(
-      90deg, 
-      rgba(255, 0, 0, 0.06), 
-      rgba(0, 255, 0, 0.02), 
-      rgba(0, 0, 255, 0.06)
     );
-    background-size: 100% 4px, 6px 100%;
+    background-size: 100% 4px;
     pointer-events: none;
     z-index: 4;
     opacity: 0.85;
+  }
+
+  /* Faint Security Scanner Sweep Line */
+  .scanner-sweep {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-neon-green), transparent);
+    opacity: 0.12;
+    box-shadow: 0 0 10px var(--color-neon-green-glow);
+    pointer-events: none;
+    z-index: 25;
+    animation: scanDown 12s infinite linear;
+  }
+
+  /* Background Canvas for Dust & Glowing Particles */
+  .bg-particles {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
   }
 
   /* 3D Mathematical Rotating Skull (Peeking Left Layout) */
@@ -172,20 +193,15 @@
 
   .left-skull {
     left: 50%;
-    transform: translate(-90%, -50%); /* Centers vertically and shifts left to peek behind the card */
+    transform: translate(-92%, -50%); /* Shifts the skull to peek behind the card */
   }
 
-  .skull-container pre {
-    font-family: var(--font-mono);
-    font-size: clamp(6.5px, 0.85vw, 10.5px);
-    line-height: 8px; /* High fidelity spacing */
-    letter-spacing: 1px;
-    font-weight: bold;
-    color: var(--color-neon-green);
-    opacity: 0.38; /* Visibly glowing green text skull */
-    text-shadow: 0 0 4px var(--color-neon-green), 0 0 12px var(--color-neon-green-glow);
-    margin: 0;
+  #hologram-canvas {
+    width: 440px;
+    height: 440px;
     pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 0 15px rgba(236, 72, 153, 0.25)); /* Subtle pink/magenta glow bloom */
   }
 
   /* Responsive styling to hide skull on narrow viewports */
@@ -251,11 +267,39 @@
   .status-dot-active {
     background-color: var(--color-neon-green);
     box-shadow: var(--glow-green);
-    animation: pulse 1.8s infinite ease-in-out;
+    animation: statusPulse 2s infinite ease-in-out;
   }
 
   .connection-code {
     color: var(--text-secondary);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Audio Toggler Button */
+  .audio-toggle-btn {
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+    border: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-right: 1.25rem;
+    outline: none;
+  }
+
+  .audio-toggle-btn:hover {
+    border-color: var(--color-neon-green);
+    color: var(--color-neon-green);
+    box-shadow: var(--glow-green);
   }
 
   .clock-display {
@@ -283,7 +327,31 @@
     border-radius: var(--radius-md);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), var(--shadow-flat-dark);
     overflow: hidden;
-    animation: terminal-flicker 0.15s infinite alternate, slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    
+    /* 3D Tilt variable anchors */
+    transform-style: preserve-3d;
+    transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Diagonal Glass Reflection Line */
+  .glass-reflection {
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.03) 45%,
+      rgba(255, 255, 255, 0.06) 50%,
+      rgba(255, 255, 255, 0.03) 55%,
+      transparent 65%
+    );
+    z-index: 6;
+    pointer-events: none;
+    animation: glassSweep 18s infinite linear;
   }
 
   /* Corner Decors */
@@ -332,6 +400,7 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    transform: translateZ(20px); /* Lift inner content slightly for 3D parallax depth */
   }
 
   /* Title Block */
@@ -347,12 +416,14 @@
     letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
     
-    /* Immortals Gradient */
-    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+    /* Immortals Gradient Animation */
+    background: linear-gradient(135deg, var(--color-gradient-start) 0%, var(--color-gradient-end) 50%, var(--color-gradient-start) 100%);
+    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-shadow: 0 0 30px oklch(62% 0.28 300 / 0.15);
+    animation: moveGradient 8s infinite linear, breatheGlow 6s infinite ease-in-out;
   }
 
   .genesis-subtitle {
@@ -390,10 +461,13 @@
 
   .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, oklch(62% 0.28 300), var(--color-neon-green));
+    /* Shimmer gradient overlay */
+    background: linear-gradient(90deg, oklch(62% 0.28 300) 0%, var(--color-neon-green) 50%, oklch(62% 0.28 300) 100%);
+    background-size: 200% auto;
     border-radius: var(--radius-full);
-    box-shadow: 0 0 8px var(--color-neon-green-glow);
-    transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 10px var(--color-neon-green-glow);
+    transition: width 0.3s ease;
+    animation: shimmerProgress 3s infinite linear;
   }
 
   /* Console Logger Panel */
@@ -457,6 +531,7 @@
   .console-row.info { color: var(--text-secondary); }
   .console-row.success { color: var(--color-neon-green); }
   .console-row.warn { color: var(--color-gradient-end); }
+  .console-row.error { color: var(--color-alert-red); }
 
   /* Input Form */
   .form-container {
@@ -501,7 +576,7 @@
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     padding-inline: 0.85rem;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
   }
 
   .input-group:focus-within {
@@ -509,11 +584,18 @@
     box-shadow: 0 0 10px var(--color-neon-green-glow);
   }
 
+  /* Input focus styles */
+  .email-input:focus ~ .input-prefix {
+    color: var(--color-neon-green);
+    text-shadow: var(--glow-green);
+  }
+
   .input-prefix {
     font-family: var(--font-mono);
-    color: var(--color-neon-green);
+    color: var(--text-tertiary);
     font-size: 0.85rem;
     margin-right: 0.5rem;
+    transition: color 0.3s ease;
   }
 
   .email-input {
@@ -529,6 +611,12 @@
 
   .email-input::placeholder {
     color: var(--text-tertiary);
+    transition: opacity 0.2s ease;
+  }
+
+  /* Placeholder flicker effect support */
+  .placeholder-flicker::placeholder {
+    animation: textFlicker 0.4s 1 linear;
   }
 
   .submit-button {
@@ -543,7 +631,9 @@
     padding: 0.75rem 1.5rem;
     cursor: pointer;
     white-space: nowrap;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.25s, border-color 0.25s, color 0.25s, transform 0.25s, box-shadow 0.25s;
   }
 
   .submit-button:hover {
@@ -551,6 +641,30 @@
     color: var(--bg-primary);
     border-color: var(--color-neon-green);
     box-shadow: var(--glow-green);
+    transform: translateY(-1px); /* Elevation */
+  }
+
+  /* Click Flash / Ripple Support */
+  .submit-button::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease-out, height 0.4s ease-out;
+  }
+
+  .submit-button:active {
+    transform: scale(0.97);
+  }
+
+  .submit-button:active::after {
+    width: 250px;
+    height: 250px;
   }
 
   .form-response {
@@ -612,6 +726,8 @@
   }
 
   .social-capsule {
+    position: relative;
+    overflow: hidden;
     background-color: var(--bg-tertiary);
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-sm);
@@ -652,6 +768,99 @@
     50% { opacity: 0.985; }
     100% { opacity: 1; }
   }
+
+  /* Scanner downwards sweep animation */
+  @keyframes scanDown {
+    0% { top: -10px; opacity: 0; }
+    5% { opacity: 0.12; }
+    95% { opacity: 0.12; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* Diagonal gloss sweep animation */
+  @keyframes glassSweep {
+    0% { left: -150%; }
+    10% { left: 150%; }
+    100% { left: 150%; }
+  }
+
+  /* Header gradient scroll */
+  @keyframes moveGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Title glow breathing */
+  @keyframes breatheGlow {
+    0% { text-shadow: 0 0 10px oklch(62% 0.28 300 / 0.1); }
+    50% { text-shadow: 0 0 25px oklch(62% 0.28 300 / 0.3), 0 0 10px var(--color-neon-green-glow); }
+    100% { text-shadow: 0 0 10px oklch(62% 0.28 300 / 0.1); }
+  }
+
+  /* Connection status slow pulse */
+  @keyframes statusPulse {
+    0% { opacity: 0.45; box-shadow: 0 0 4px var(--color-neon-green-glow); }
+    50% { opacity: 1; box-shadow: 0 0 12px var(--color-neon-green), 0 0 4px var(--color-neon-green); }
+    100% { opacity: 0.45; box-shadow: 0 0 4px var(--color-neon-green-glow); }
+  }
+
+  /* Progress bar shimmer gradient scroll */
+  @keyframes shimmerProgress {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+
+  /* Placeholder text flicker */
+  @keyframes textFlicker {
+    0% { opacity: 1; }
+    15% { opacity: 0.15; }
+    30% { opacity: 0.9; }
+    45% { opacity: 0.05; }
+    60% { opacity: 1; }
+    80% { opacity: 0.3; }
+    100% { opacity: 1; }
+  }
+
+  /* System Glitch class Keyframes */
+  @keyframes glitchSplit {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 1px) skew(1deg); }
+    40% { transform: translate(-1px, -1px) skew(-0.5deg); }
+    60% { transform: translate(1.5px, 0.5px) skew(0.5deg); }
+    80% { transform: translate(-0.5px, -1.5px) skew(0.2deg); }
+    100% { transform: translate(0); }
+  }
+
+  @keyframes chromaticAberration {
+    0% { text-shadow: 0.5px 0 0 red, -0.5px 0 0 blue; }
+    50% { text-shadow: -1.5px 0.5px 0 red, 1px -0.5px 0 blue, 0 0 10px var(--color-neon-green-glow); }
+    100% { text-shadow: 0.5px 0 0 red, -0.5px 0 0 blue; }
+  }
+
+  .glitch-active {
+    animation: glitchSplit 0.22s infinite linear !important;
+  }
+
+  .glitch-active .genesis-title {
+    animation: chromaticAberration 0.15s infinite linear !important;
+  }
+
+  /* Button ripple span styles */
+  .btn-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.28);
+    transform: scale(0);
+    animation: btn-ripple-effect 0.55s ease-out;
+    pointer-events: none;
+  }
+  @keyframes btn-ripple-effect {
+    to {
+      transform: scale(3.5);
+      opacity: 0;
+    }
+  }
 }
 
 /* Responsive heights and mobile views to prevent absolute overlap */
@@ -684,7 +893,7 @@
   }
 }
 
-/* Reduced Motion */
+/* Reduced Motion preferences */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-delay: 0s !important;
@@ -694,8 +903,7 @@
     scroll-behavior: auto !important;
     transform: none !important;
   }
-  .ascii-skull {
+  #hologram-canvas {
     animation: none !important;
-    transform: rotateY(35deg) rotateZ(2deg) !important;
   }
 }

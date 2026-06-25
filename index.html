@@ -38,10 +38,16 @@
   <!-- CRT Screen Glitch Effects -->
   <div class="film-grain"></div>
   <div class="scanlines"></div>
+  
+  <!-- Faint Security Scanner Sweep Line -->
+  <div class="scanner-sweep"></div>
 
-  <!-- 3D Mathematical Rotating Skull positioned on the left side peeking under the card -->
+  <!-- Background Canvas for Slow Moving Dust & Floating Particles -->
+  <canvas id="bg-particles" class="bg-particles"></canvas>
+
+  <!-- 3D Holographic AI Skull Canvas flanking the left side peeking under the card -->
   <div class="skull-container left-skull">
-    <pre id="matrix-skull"></pre>
+    <canvas id="hologram-canvas"></canvas>
   </div>
 
   <div class="app-container">
@@ -59,6 +65,8 @@
       </div>
       
       <div class="header-right">
+        <!-- Interactive Low-Frequency Audio Hum Toggler -->
+        <button id="audio-toggle-btn" class="audio-toggle-btn" title="Toggle System Hum">[ AUDIO: MUTED ]</button>
         <div id="clock-display" class="clock-display">
           UTC: --:--:-- | LOC: --:--:--
         </div>
@@ -68,7 +76,10 @@
     <!-- Main Content Area -->
     <main class="main-content">
       
-      <section class="terminal-card">
+      <section class="terminal-card" id="terminal-card">
+        <!-- Subtle Diagonal Glass Reflection Sweep -->
+        <div class="glass-reflection"></div>
+        
         <!-- Target Corner Decors -->
         <div class="corner corner-tl"></div>
         <div class="corner corner-tr"></div>
@@ -90,7 +101,7 @@
 
           <!-- Main Brutalist Header -->
           <div class="title-section">
-            <h1 class="genesis-title">BE PART OF OUR GENESIS</h1>
+            <h1 class="genesis-title" id="genesis-title">BE PART OF OUR GENESIS</h1>
             <p class="genesis-subtitle">SOL0425 // PORTAL CALIBRATION IN PROGRESS</p>
           </div>
 
@@ -98,10 +109,10 @@
           <div class="progress-container">
             <div class="progress-header">
               <span class="progress-title">SYSTEM DECRYPTION STATUS</span>
-              <span class="progress-pct" id="progress-percentage">84.2%</span>
+              <span class="progress-pct" id="progress-percentage">84.220%</span>
             </div>
             <div class="progress-track">
-              <div class="progress-bar" id="progress-bar" style="width: 84.2%;"></div>
+              <div class="progress-bar" id="progress-bar" style="width: 84.22%;"></div>
             </div>
           </div>
 
@@ -109,7 +120,7 @@
           <div class="console-logger">
             <div class="console-header">
               <span>SYSTEM LOGS [RAAVH-SEC::92]</span>
-              <span class="console-pulse">LIVE</span>
+              <span class="console-pulse" id="console-pulse">LIVE</span>
             </div>
             <div class="console-output" id="console-output">
               <!-- Dynamically populated by script.js -->
@@ -122,7 +133,7 @@
             <p class="form-desc">Provide your credentials to establish secure link and receive genesis tokens.</p>
             
             <form id="subscribe-form" class="subscribe-form">
-              <div class="input-group">
+              <div class="input-group" id="input-group-wrapper">
                 <span class="input-prefix">&gt;</span>
                 <input 
                   type="email" 
