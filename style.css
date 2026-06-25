@@ -205,7 +205,7 @@
   }
 
   /* Responsive styling to hide skull on narrow viewports and center the central card */
-  @media (max-width: 1340px) {
+  @media (max-width: 1100px) {
     .skull-container {
       display: none;
     }
