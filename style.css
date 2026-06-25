@@ -956,7 +956,7 @@
   .skull-container {
     display: flex !important;
     position: absolute;
-    top: 14.5rem;
+    top: 18.5rem;
     left: 50%;
     z-index: 5;
   }
@@ -968,7 +968,7 @@
 
   /* Main Content Layout */
   .main-content {
-    margin-top: 18rem; /* Push card down to sit perfectly under the skull, peeking behind the top of the card */
+    margin-top: 22.5rem; /* Push card down to sit perfectly under the skull with minimal gap */
     margin-right: 0 !important;
     width: 100%;
     max-width: 100%;

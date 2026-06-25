@@ -171,7 +171,7 @@ function init3DSkullCanvas() {
     const scanAngle = Math.sin(Date.now() / 3500) * 0.6; 
     
     const angleY = baseAngleY + scanAngle + currentTiltY * 0.4;
-    const angleX = 0.15 + currentTiltX * 0.3; // Slight downward tilt, responsive to mouse/tilt
+    const angleX = 0.05 + currentTiltX * 0.2; // Keep skull upright, responsive to mouse/tilt
 
     // Update & Draw Dissolution Particles
     if (Math.random() < 0.35 && skullPoints.length > 0) {
