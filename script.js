@@ -95,8 +95,8 @@ function init3DSkullCanvas() {
   const canvas = document.getElementById('hologram-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const width = canvas.width = 440;
-  const height = canvas.height = 440;
+  const width = canvas.width = 660;
+  const height = canvas.height = 660;
 
   // Sculpt the 3D skull points
   // A. Cranium
@@ -143,7 +143,7 @@ function init3DSkullCanvas() {
   }
 
   let rotationAngle = 0;
-  const scale = 360;
+  const scale = 520;
   const distance = 3.8;
 
   function getRotatedProjectedPoint(p, angleY, angleX) {
@@ -313,7 +313,7 @@ function initMouseParallax() {
     if (skullContainer) {
       const pX = currentTiltY * 25;
       const pY = currentTiltX * 25;
-      skullContainer.style.transform = `translate(calc(-180% + ${pX}px), calc(-50% + ${pY}px))`;
+      skullContainer.style.transform = `translate(calc(-50% + ${pX}px), calc(-50% + ${pY}px))`;
     }
 
     requestAnimationFrame(updateParallax);

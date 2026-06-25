@@ -192,13 +192,13 @@
   }
 
   .left-skull {
-    left: 50%;
-    transform: translate(-180%, -50%); /* Shifts the skull fully to the left of the card */
+    left: 25%;
+    transform: translate(-50%, -50%); /* Centers the skull on the left half of the screen */
   }
 
   #hologram-canvas {
-    width: 440px;
-    height: 440px;
+    width: 660px;
+    height: 660px;
     pointer-events: none;
     user-select: none;
     filter: drop-shadow(0 0 15px rgba(236, 72, 153, 0.25)); /* Subtle pink/magenta glow bloom */
@@ -314,7 +314,8 @@
     justify-content: center;
     align-items: center;
     padding-block: 4rem;
-    margin-block: auto;
+    align-self: flex-end;
+    margin-right: 8%;
     z-index: 15;
   }
 
