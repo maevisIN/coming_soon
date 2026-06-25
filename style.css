@@ -204,10 +204,16 @@
     filter: drop-shadow(0 0 15px rgba(236, 72, 153, 0.25)); /* Subtle pink/magenta glow bloom */
   }
 
-  /* Responsive styling to hide skull on narrow viewports */
-  @media (max-width: 1100px) {
+  /* Responsive styling to hide skull on narrow viewports and center the central card */
+  @media (max-width: 1340px) {
     .skull-container {
       display: none;
+    }
+    .main-content {
+      align-self: center;
+      margin-right: 0;
+      margin-left: auto;
+      margin-right: auto;
     }
   }
 
@@ -864,8 +870,8 @@
   }
 }
 
-/* Responsive heights and mobile views to prevent absolute overlap */
-@media (max-height: 720px), (max-width: 768px) {
+/* Responsive heights to prevent absolute overlap on short viewports */
+@media (max-height: 720px) {
   .app-container {
     justify-content: flex-start;
     padding-top: 5rem;
@@ -883,7 +889,7 @@
     bottom: auto;
     left: auto;
     right: auto;
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     width: 100%;
     padding-top: 1rem;
     border-top: 1px solid var(--border-subtle);
@@ -891,6 +897,132 @@
   .main-content {
     padding-block: 1rem;
     margin-block: 0;
+  }
+}
+
+/* Mobile-specific responsive styles */
+@media (max-width: 768px) {
+  .app-container {
+    justify-content: flex-start;
+    padding-top: 5rem;
+    padding-bottom: 2rem;
+    padding-inline: 0.75rem;
+  }
+  
+  /* System Header Mobile Adjustments */
+  .system-header {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: center;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.75rem;
+  }
+
+  .header-left {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .header-center {
+    justify-content: center;
+    width: 100%;
+    font-size: 0.7rem;
+  }
+
+  .header-right {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .audio-toggle-btn {
+    margin-right: 0 !important;
+    padding: 3px 8px;
+    font-size: 0.6rem;
+  }
+
+  .clock-display {
+    font-size: 0.65rem;
+    text-align: center;
+  }
+
+  /* Skull Container Centering & Scaling */
+  .skull-container {
+    display: flex !important;
+    position: absolute;
+    top: 14.5rem;
+    left: 50%;
+    z-index: 5;
+  }
+
+  #hologram-canvas {
+    width: 280px;
+    height: 280px;
+  }
+
+  /* Main Content Layout */
+  .main-content {
+    margin-top: 23rem; /* Push card down to sit perfectly under the skull */
+    margin-right: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 0.25rem;
+    align-self: center;
+  }
+  
+  .terminal-card {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+    transform: none !important; /* Disable 3D tilt on mobile touch to avoid layout jumping */
+  }
+
+  .terminal-body {
+    padding: 1.75rem 1.25rem;
+    gap: 1.5rem;
+  }
+
+  .genesis-title {
+    font-size: clamp(1.8rem, 6vw, 2.5rem);
+  }
+
+  .console-output {
+    height: 95px;
+  }
+
+  .subscribe-form {
+    flex-direction: column !important;
+    gap: 0.75rem;
+  }
+
+  .submit-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Footer Mobile Adjustments */
+  .system-footer {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    margin-top: 2.5rem;
+    width: 100%;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-subtle);
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-center {
+    justify-content: center;
+    gap: 0.5rem;
   }
 }
 
