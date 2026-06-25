@@ -192,8 +192,8 @@
   }
 
   .left-skull {
-    left: 25%;
-    transform: translate(-50%, -50%); /* Centers the skull on the left half of the screen */
+    left: 35%;
+    transform: translate(-50%, -50%); /* Centers the skull closer to the card on desktop */
   }
 
   #hologram-canvas {
@@ -321,7 +321,7 @@
     align-items: center;
     padding-block: 4rem;
     align-self: flex-end;
-    margin-right: 8%;
+    margin-right: 12%; /* Shift slightly left to close the gap with the skull */
     z-index: 15;
   }
 
@@ -968,7 +968,7 @@
 
   /* Main Content Layout */
   .main-content {
-    margin-top: 23rem; /* Push card down to sit perfectly under the skull */
+    margin-top: 18rem; /* Push card down to sit perfectly under the skull, peeking behind the top of the card */
     margin-right: 0 !important;
     width: 100%;
     max-width: 100%;

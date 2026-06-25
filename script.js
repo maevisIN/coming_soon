@@ -98,9 +98,9 @@ function init3DSkullCanvas() {
   const width = canvas.width = 660;
   const height = canvas.height = 660;
 
-  // Sculpt the 3D skull points
+  // Sculpt the 3D skull points (Denser point cloud for organic visibility)
   // A. Cranium
-  for (let i = 0; i < 650; i++) {
+  for (let i = 0; i < 1300; i++) {
       let theta = Math.random() * Math.PI * 2;
       let phi = Math.random() * (Math.PI * 0.65);
       skullPoints.push({
@@ -111,7 +111,7 @@ function init3DSkullCanvas() {
   }
   
   // B. Face, Cheekbones & Nasal Cavity
-  for (let i = 0; i < 750; i++) {
+  for (let i = 0; i < 1600; i++) {
       let y = (Math.random() * 1.4) - 0.5;
       let widthFactor = y < 0.2 ? 1.3 : 0.85;
       let rad = Math.sqrt(Math.max(0, 1 - (y * y))) * widthFactor;
@@ -131,7 +131,7 @@ function init3DSkullCanvas() {
   }
   
   // C. Lower Teeth & Narrow Jaw
-  for (let i = 0; i < 400; i++) {
+  for (let i = 0; i < 900; i++) {
       let y = (Math.random() * 0.5) + 0.9;
       let theta = (Math.random() * Math.PI * 0.5) - (Math.PI * 0.25);
       let rad = 0.65 - (y * 0.1); 
@@ -161,9 +161,17 @@ function init3DSkullCanvas() {
     ctx.clearRect(0, 0, width, height);
 
     // Mouse Parallax integration
-    rotationAngle += 0.015;
-    const angleY = rotationAngle + currentTiltY * 0.4;
-    const angleX = 0.2 + currentTiltX * 0.4;
+    const displayWidth = canvas.clientWidth || 660;
+    const isMobileSize = displayWidth < 500;
+    
+    // On desktop, face slightly right (towards the card); on mobile, face straight front
+    const baseAngleY = isMobileSize ? 0.0 : 0.55;
+    
+    // Slow scanning oscillation instead of full rotation so the detailed front face is always visible
+    const scanAngle = Math.sin(Date.now() / 3500) * 0.6; 
+    
+    const angleY = baseAngleY + scanAngle + currentTiltY * 0.4;
+    const angleX = 0.15 + currentTiltX * 0.3; // Slight downward tilt, responsive to mouse/tilt
 
     // Update & Draw Dissolution Particles
     if (Math.random() < 0.35 && skullPoints.length > 0) {
