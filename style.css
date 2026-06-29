@@ -192,7 +192,7 @@
   }
 
   .left-skull {
-    left: 35%;
+    left: 28%;
     transform: translate(-50%, -50%); /* Centers the skull closer to the card on desktop */
   }
 
@@ -285,6 +285,56 @@
     align-items: center;
   }
 
+  /* Game Route Container */
+  .game-route-container {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 1.25rem;
+    gap: 6px;
+  }
+
+  /* Game Route Hint & Arrow */
+  .game-route-hint {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--color-neon-green);
+    text-shadow: 0 0 2px rgba(56, 176, 0, 0.4);
+    letter-spacing: 1px;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+  }
+
+  .game-route-hint .hint-arrow {
+    display: inline-block;
+    font-weight: bold;
+    animation: hintArrowPulse 1.5s infinite ease-in-out;
+  }
+
+  @keyframes hintArrowPulse {
+    0%, 100% { transform: translateX(0); opacity: 0.5; }
+    50% { transform: translateX(4px); opacity: 1; text-shadow: 0 0 5px var(--color-neon-green); }
+  }
+
+  /* Glowing Alert Animation for Button */
+  .game-route-btn.pulse-alert {
+    animation: btnGlowPulse 2.5s infinite ease-in-out;
+  }
+
+  @keyframes btnGlowPulse {
+    0%, 100% {
+      border-color: var(--border-primary);
+      box-shadow: none;
+    }
+    50% {
+      border-color: var(--color-neon-green);
+      box-shadow: 0 0 8px rgba(56, 176, 0, 0.3);
+      color: var(--color-neon-green);
+    }
+  }
+
   /* Game Route Button & Audio Toggler Button */
   .game-route-btn,
   .audio-toggle-btn {
@@ -299,10 +349,13 @@
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.25s ease;
-    margin-right: 1.25rem;
     outline: none;
     display: inline-flex;
     align-items: center;
+  }
+
+  .audio-toggle-btn {
+    margin-right: 1.25rem;
   }
 
   .game-route-btn:hover,
@@ -943,6 +996,11 @@
     gap: 0.5rem;
     align-items: center;
     width: 100%;
+  }
+
+  .game-route-container {
+    margin-right: 0 !important;
+    gap: 4px;
   }
 
   .game-route-btn,
