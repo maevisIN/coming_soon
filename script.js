@@ -80,16 +80,228 @@ function initBackgroundParticles() {
 }
 
 /**
-  * 2. 3D HOLOGRAM CANVAS SKULL
+  * 2. 3D HOLOGRAM CANVAS - ASCII OBJECTS (randomly selected per reload)
+  *
+  * The 3D object is rendered as a cloud of ASCII / special characters whose
+  * glyph is chosen from a luminance ramp (.,-~:;=!*#$@). A different object is
+  * picked at random on every page load (skull, donut, cube, sphere, knot,
+  * diamond, ...).
   */
-const skullPoints = [];
+const objectPoints = [];          // active object point cloud {x,y,z}
+const objectGlowPoints = [];      // optional emissive anchor points {x,y,z}
 const dissolutionParticles = [];
+let activeObjectName = 'SKULL';   // name of the currently rendered object
+
+// ASCII luminance ramp, dark->bright. '.' is faint, '@' is fully lit.
+const ASCII_RAMP = " .:-=+*#%@";
 
 // Spring parallax values updated by mousemove listener
 let currentTiltX = 0;
 let currentTiltY = 0;
 let targetTiltX = 0;
 let targetTiltY = 0;
+
+// ---------------------------------------------------------------------------
+// 3D OBJECT GENERATORS
+// Each returns { points:[{x,y,z}], glow:[{x,y,z}] } where points is the surface
+// cloud and glow is an optional list of emissive anchor points (e.g. eyes).
+// ---------------------------------------------------------------------------
+
+/** Classic anatomical skull: cranium + face/jaw with carved sockets & nose. */
+function generateSkull() {
+  const points = [];
+  // A. Cranium
+  for (let i = 0; i < 1300; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.random() * (Math.PI * 0.65);
+    points.push({
+      x: Math.cos(theta) * Math.sin(phi) * 1.5,
+      y: -Math.cos(phi) * 1.3 - 0.4,
+      z: Math.sin(theta) * Math.sin(phi) * 1.5
+    });
+  }
+  // B. Face, Cheekbones & Nasal Cavity
+  for (let i = 0; i < 1600; i++) {
+    const y = (Math.random() * 1.4) - 0.5;
+    const widthFactor = y < 0.2 ? 1.3 : 0.85;
+    const rad = Math.sqrt(Math.max(0, 1 - (y * y))) * widthFactor;
+    const theta = (Math.random() * Math.PI * 0.8) - (Math.PI * 0.4);
+    const x = Math.sin(theta) * rad;
+    const z = Math.cos(theta) * rad + 0.3;
+    if (y > -0.3 && y < 0.1 && Math.abs(x) > 0.3 && Math.abs(x) < 0.85) continue; // sockets
+    if (y > 0.1 && y < 0.4 && Math.abs(x) < (y - 0.1) * 0.9) continue;             // nose
+    if (y > -0.5 && y < -0.1 && Math.abs(theta) > 0.8) continue;                   // temple
+    points.push({ x, y, z });
+  }
+  // C. Lower Teeth & Narrow Jaw
+  for (let i = 0; i < 900; i++) {
+    const y = (Math.random() * 0.5) + 0.9;
+    const theta = (Math.random() * Math.PI * 0.5) - (Math.PI * 0.25);
+    const rad = 0.65 - (y * 0.1);
+    points.push({ x: Math.sin(theta) * rad, y, z: Math.cos(theta) * rad + 0.4 });
+  }
+  return { points, glow: [{ x: -0.36, y: -0.12, z: 0.82 }, { x: 0.36, y: -0.12, z: 0.82 }] };
+}
+
+/** Classic spinning ASCII donut (torus) a la donut.c */
+function generateDonut() {
+  const points = [];
+  const R = 1.0;   // major radius
+  const r = 0.45;  // minor radius
+  const stepsA = 52, stepsB = 26;
+  for (let i = 0; i < stepsA; i++) {
+    const a = (i / stepsA) * Math.PI * 2;
+    for (let j = 0; j < stepsB; j++) {
+      const b = (j / stepsB) * Math.PI * 2;
+      points.push({
+        x: (R + r * Math.cos(b)) * Math.cos(a),
+        y: r * Math.sin(b),
+        z: (R + r * Math.cos(b)) * Math.sin(a)
+      });
+    }
+  }
+  return { points, glow: [] };
+}
+
+/** Solid cube made of densely sampled face points + bright wireframe edges. */
+function generateCube() {
+  const points = [];
+  const s = 1.05;
+  const faces = [
+    { n: [0, 0, 1],  u: [1, 0, 0],  v: [0, 1, 0] },   // +Z
+    { n: [0, 0, -1], u: [-1, 0, 0], v: [0, 1, 0] },   // -Z
+    { n: [1, 0, 0],  u: [0, 0, -1], v: [0, 1, 0] },   // +X
+    { n: [-1, 0, 0], u: [0, 0, 1],  v: [0, 1, 0] },   // -X
+    { n: [0, 1, 0],  u: [1, 0, 0],  v: [0, 0, -1] },  // +Y
+    { n: [0, -1, 0], u: [1, 0, 0],  v: [0, 0, 1] }    // -Y
+  ];
+  for (const f of faces) {
+    for (let i = 0; i <= 18; i++) {
+      for (let j = 0; j <= 18; j++) {
+        const tu = -s + (i / 18) * 2 * s;
+        const tv = -s + (j / 18) * 2 * s;
+        // boost density on the edges for a wireframe-y outline
+        const edge = (i % 6 === 0 || j % 6 === 0) ? 0 : 0.35;
+        if (Math.random() < edge) continue;
+        points.push({
+          x: f.n[0] * s + f.u[0] * tu + f.v[0] * tv,
+          y: f.n[1] * s + f.u[1] * tu + f.v[1] * tv,
+          z: f.n[2] * s + f.u[2] * tu + f.v[2] * tv
+        });
+      }
+    }
+  }
+  return { points, glow: [] };
+}
+
+/** Uniform sphere sampled with spherical coordinates. */
+function generateSphere() {
+  const points = [];
+  const R = 1.25;
+  const stepsA = 60, stepsB = 30;
+  for (let i = 0; i < stepsA; i++) {
+    const a = (i / stepsA) * Math.PI * 2;       // longitude
+    for (let j = 0; j < stepsB; j++) {
+      const b = (j / stepsB) * Math.PI;          // latitude
+      points.push({
+        x: R * Math.sin(b) * Math.cos(a),
+        y: R * Math.cos(b),
+        z: R * Math.sin(b) * Math.sin(a)
+      });
+    }
+  }
+  return { points, glow: [] };
+}
+
+/** Trefoil knot - a flowing, twisting ribbon of points. */
+function generateKnot() {
+  const points = [];
+  const tubeR = 0.32;
+  const segs = 220, ring = 14;
+  for (let i = 0; i < segs; i++) {
+    const t = (i / segs) * Math.PI * 2;
+    const cx = Math.sin(t) + 2 * Math.sin(2 * t);
+    const cy = Math.cos(t) - 2 * Math.cos(2 * t);
+    const cz = -Math.sin(3 * t);
+    // local frame: tangent -> normal -> binormal
+    const dx = Math.cos(t) + 4 * Math.cos(2 * t);
+    const dy = -Math.sin(t) + 4 * Math.sin(2 * t);
+    const dz = -3 * Math.cos(3 * t);
+    const tl = Math.hypot(dx, dy, dz) || 1;
+    const tx = dx / tl, ty = dy / tl, tz = dz / tl;
+    // crude normal ~= up x tangent
+    let nx = ty * 0 - tz * 1, ny = tz * 0 - tx * 0, nz = tx * 1 - ty * 0;
+    const nl = Math.hypot(nx, ny, nz) || 1;
+    nx /= nl; ny /= nl; nz /= nl;
+    const bx = ty * nz - tz * ny, by = tz * nx - tx * nz, bz = tx * ny - ty * nx;
+    for (let j = 0; j < ring; j++) {
+      const a = (j / ring) * Math.PI * 2;
+      const ca = Math.cos(a), sa = Math.sin(a);
+      points.push({
+        x: cx * 0.45 + (nx * ca + bx * sa) * tubeR,
+        y: cy * 0.45 + (ny * ca + by * sa) * tubeR,
+        z: cz * 0.45 + (nz * ca + bz * sa) * tubeR
+      });
+    }
+  }
+  return { points, glow: [] };
+}
+
+/** Faceted diamond/gem: two cones joined at the equator. */
+function generateDiamond() {
+  const points = [];
+  const rad = 1.1;
+  const height = 1.6;
+  const rings = 28, sides = 26;
+  for (let i = 0; i < rings; i++) {
+    const v = i / (rings - 1);                 // 0..1
+    const y = -height / 2 + v * height;        // bottom -> top
+    const t = Math.abs(y) / (height / 2);      // 0 at equator, 1 at tips
+    const r = rad * (1 - t);                    // widest at equator
+    for (let j = 0; j < sides; j++) {
+      const a = (j / sides) * Math.PI * 2;
+      points.push({ x: r * Math.cos(a), y, z: r * Math.sin(a) });
+    }
+  }
+  // tip points
+  points.push({ x: 0, y: -height / 2, z: 0 });
+  points.push({ x: 0, y: height / 2, z: 0 });
+  return { points, glow: [] };
+}
+
+/** Twisted helix DNA strand - two intertwined spirals with rungs. */
+function generateHelix() {
+  const points = [];
+  const turns = 3, steps = 240, R = 0.8;
+  for (let i = 0; i < steps; i++) {
+    const t = (i / steps) * turns * Math.PI * 2;
+    const y = (i / steps) * 2.6 - 1.3;
+    points.push({ x: R * Math.cos(t), y, z: R * Math.sin(t) });           // strand 1
+    points.push({ x: R * Math.cos(t + Math.PI), y, z: R * Math.sin(t + Math.PI) }); // strand 2
+    if (i % 8 === 0) {                                                     // rung
+      for (let k = 1; k < 8; k++) {
+        const f = k / 8;
+        points.push({
+          x: R * Math.cos(t) * (1 - f) + R * Math.cos(t + Math.PI) * f,
+          y,
+          z: R * Math.sin(t) * (1 - f) + R * Math.sin(t + Math.PI) * f
+        });
+      }
+    }
+  }
+  return { points, glow: [] };
+}
+
+/** Registry of all generatable objects. New shapes can be appended freely. */
+const OBJECT_REGISTRY = [
+  { name: 'SKULL',    generate: generateSkull },
+  { name: 'DONUT',    generate: generateDonut },
+  { name: 'CUBE',     generate: generateCube },
+  { name: 'SPHERE',   generate: generateSphere },
+  { name: 'KNOT',     generate: generateKnot },
+  { name: 'DIAMOND',  generate: generateDiamond },
+  { name: 'HELIX',    generate: generateHelix }
+];
 
 function init3DSkullCanvas() {
   const canvas = document.getElementById('hologram-canvas');
@@ -98,53 +310,22 @@ function init3DSkullCanvas() {
   const width = canvas.width = 660;
   const height = canvas.height = 660;
 
-  // Sculpt the 3D skull points (Denser point cloud for organic visibility)
-  // A. Cranium
-  for (let i = 0; i < 1300; i++) {
-      let theta = Math.random() * Math.PI * 2;
-      let phi = Math.random() * (Math.PI * 0.65);
-      skullPoints.push({
-          x: Math.cos(theta) * Math.sin(phi) * 1.5,
-          y: -Math.cos(phi) * 1.3 - 0.4,
-          z: Math.sin(theta) * Math.sin(phi) * 1.5
-      });
-  }
-  
-  // B. Face, Cheekbones & Nasal Cavity
-  for (let i = 0; i < 1600; i++) {
-      let y = (Math.random() * 1.4) - 0.5;
-      let widthFactor = y < 0.2 ? 1.3 : 0.85;
-      let rad = Math.sqrt(Math.max(0, 1 - (y * y))) * widthFactor;
-      let theta = (Math.random() * Math.PI * 0.8) - (Math.PI * 0.4);
-      
-      let x = Math.sin(theta) * rad;
-      let z = Math.cos(theta) * rad + 0.3;
+  // --- Pick a RANDOM object on every page load -----------------------------
+  const choice = OBJECT_REGISTRY[Math.floor(Math.random() * OBJECT_REGISTRY.length)];
+  activeObjectName = choice.name;
+  const model = choice.generate();
+  objectPoints.push(...model.points);
+  objectGlowPoints.push(...(model.glow || []));
+  console.log('[MAEVIS] Hologram object selected:', activeObjectName);
 
-      // Carve sockets
-      if (y > -0.3 && y < 0.1 && Math.abs(x) > 0.3 && Math.abs(x) < 0.85) continue;
-      // Carve nose
-      if (y > 0.1 && y < 0.4 && Math.abs(x) < (y - 0.1) * 0.9) continue;
-      // Carve temple
-      if (y > -0.5 && y < -0.1 && Math.abs(theta) > 0.8) continue;
-
-      skullPoints.push({ x: x, y: y, z: z });
-  }
-  
-  // C. Lower Teeth & Narrow Jaw
-  for (let i = 0; i < 900; i++) {
-      let y = (Math.random() * 0.5) + 0.9;
-      let theta = (Math.random() * Math.PI * 0.5) - (Math.PI * 0.25);
-      let rad = 0.65 - (y * 0.1); 
-      skullPoints.push({
-          x: Math.sin(theta) * rad,
-          y: y,
-          z: Math.cos(theta) * rad + 0.4
-      });
-  }
-
-  let rotationAngle = 0;
   const scale = 520;
   const distance = 3.8;
+
+  // ASCII glyph rendering uses a monospace font
+  const FONT_SIZE = 11;
+  ctx.font = `${FONT_SIZE}px "JetBrains Mono", "Courier New", monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
 
   function getRotatedProjectedPoint(p, angleY, angleX) {
     let x1 = p.x * Math.cos(angleY) - p.z * Math.sin(angleY);
@@ -157,30 +338,88 @@ function init3DSkullCanvas() {
     return { xp, yp, z2, ooz };
   }
 
+  // Rotate a point and also return its surface normal for lighting.
+  function getRotatedNormal(p, angleY, angleX) {
+    // Approximate normal as the radial direction from the object centre.
+    const len = Math.hypot(p.x, p.y, p.z) || 1;
+    let nx = p.x / len, ny = p.y / len, nz = p.z / len;
+    // rotate normal exactly like the position
+    let x1 = nx * Math.cos(angleY) - nz * Math.sin(angleY);
+    let z1 = nx * Math.sin(angleY) + nz * Math.cos(angleY);
+    let y2 = ny * Math.cos(angleX) - z1 * Math.sin(angleX);
+    let z2 = ny * Math.sin(angleX) + z1 * Math.cos(angleX);
+    return { nx: x1, ny: y2, nz: z2 };
+  }
+
   function drawFrame() {
     ctx.clearRect(0, 0, width, height);
 
     // Mouse Parallax integration
     const displayWidth = canvas.clientWidth || 660;
     const isMobileSize = displayWidth < 500;
-    
-    // On desktop, face slightly right (towards the card); on mobile, face straight front
-    const baseAngleY = isMobileSize ? 0.0 : 0.55;
-    
-    // Slow scanning oscillation instead of full rotation so the detailed front face is always visible
-    const scanAngle = Math.sin(Date.now() / 3500) * 0.6; 
-    
-    const angleY = baseAngleY + scanAngle + currentTiltY * 0.4;
-    const angleX = 0.05 + currentTiltX * 0.2; // Keep skull upright, responsive to mouse/tilt
 
-    // Update & Draw Dissolution Particles
-    if (Math.random() < 0.35 && skullPoints.length > 0) {
-      const randPt = skullPoints[Math.floor(Math.random() * skullPoints.length)];
+    // On desktop, turn slightly right (towards the card); on mobile, face straight front
+    const baseAngleY = isMobileSize ? 0.0 : 0.55;
+
+    // Slow scanning oscillation so the detailed front stays visible
+    const scanAngle = Math.sin(Date.now() / 3500) * 0.6;
+
+    const angleY = baseAngleY + scanAngle + currentTiltY * 0.4;
+    const angleX = 0.05 + currentTiltX * 0.2; // keep upright, responsive to mouse/tilt
+
+    // Light direction (towards viewer, slightly up & right) - used for shading
+    const lightDir = { x: 0.35, y: -0.35, z: 0.87 };
+    const ll = Math.hypot(lightDir.x, lightDir.y, lightDir.z);
+    lightDir.x /= ll; lightDir.y /= ll; lightDir.z /= ll;
+
+    // --- Project + shade every point into an ASCII glyph ------------------
+    const glyphs = [];
+    for (let i = 0; i < objectPoints.length; i++) {
+      const p = objectPoints[i];
+      const pt = getRotatedProjectedPoint(p, angleY, angleX);
+      if (pt.xp < 0 || pt.xp >= width || pt.yp < 0 || pt.yp >= height) continue;
+
+      const n = getRotatedNormal(p, angleY, angleX);
+      // Lambert brightness: dot(normal, light)
+      let lum = n.nx * lightDir.x + n.ny * lightDir.y + n.nz * lightDir.z;
+      // fold in depth so closer points read slightly brighter
+      const depthT = Math.max(0, Math.min(1, (pt.z2 + 1.5) / 3.0));
+      lum = Math.max(0, lum) * 0.7 + depthT * 0.45;
+      lum = Math.max(0, Math.min(1, lum));
+
+      glyphs.push({ xp: pt.xp, yp: pt.yp, z2: pt.z2, lum });
+    }
+
+    // Back-to-front so closer glyphs overwrite the farther ones
+    glyphs.sort((a, b) => a.z2 - b.z2);
+
+    // --- Render glyphs ----------------------------------------------------
+    const glitching = isGlitching;
+    for (const g of glyphs) {
+      const idx = Math.min(ASCII_RAMP.length - 1, Math.floor(g.lum * ASCII_RAMP.length));
+      const char = ASCII_RAMP[idx];
+
+      let dx = 0, dy = 0;
+      if (glitching) { dx = (Math.random() - 0.5) * 14; dy = (Math.random() - 0.5) * 7; }
+
+      // Magenta (236,72,153) -> Orange (249,115,22) blend by luminance
+      const r = Math.round(236 + g.lum * (249 - 236));
+      const gg = Math.round(72 + g.lum * (115 - 72));
+      const b = Math.round(153 + g.lum * (22 - 153));
+      const alpha = 0.45 + g.lum * 0.55;
+      ctx.fillStyle = glitching
+        ? (Math.random() > 0.5 ? 'rgba(236,72,153,0.8)' : 'rgba(0,255,255,0.8)')
+        : `rgba(${r},${gg},${b},${alpha})`;
+      ctx.fillText(char, g.xp + dx, g.yp + dy);
+    }
+
+    // --- Spawn & draw dissolution particles -------------------------------
+    if (Math.random() < 0.35 && objectPoints.length > 0) {
+      const randPt = objectPoints[Math.floor(Math.random() * objectPoints.length)];
       const ptProj = getRotatedProjectedPoint(randPt, angleY, angleX);
       if (ptProj.z2 > 0) {
-        const displayWidth = canvas.clientWidth || 660;
-        const isMobileSize = displayWidth < 500;
         const sizeMultiplier = isMobileSize ? 2.5 : 1.0;
+        const dustChars = ['.', '*', '+', ':', '`'];
         dissolutionParticles.push({
           x: ptProj.xp,
           y: ptProj.yp,
@@ -189,12 +428,12 @@ function init3DSkullCanvas() {
           alpha: 1.0,
           decay: 0.01 + Math.random() * 0.015,
           color: Math.random() > 0.5 ? 'rgba(236, 72, 153, ' : 'rgba(249, 115, 22, ',
-          size: (Math.random() * 1.5 + 0.5) * sizeMultiplier
+          size: (Math.random() * 1.5 + 0.5) * sizeMultiplier,
+          char: dustChars[Math.floor(Math.random() * dustChars.length)]
         });
       }
     }
 
-    // Draw dissolution particles
     for (let i = dissolutionParticles.length - 1; i >= 0; i--) {
       const p = dissolutionParticles[i];
       p.x += p.vx;
@@ -204,73 +443,22 @@ function init3DSkullCanvas() {
         dissolutionParticles.splice(i, 1);
       } else {
         ctx.fillStyle = p.color + p.alpha + ')';
-        ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+        ctx.fillText(p.char, p.x, p.y);
       }
     }
 
-    // Draw Skull points
-    if (isGlitching) {
-      const dx = (Math.random() - 0.5) * 16;
-      const dy = (Math.random() - 0.5) * 8;
-      drawPoints(angleY, angleX, dx, dy, 'rgba(236, 72, 153, 0.7)');
-      drawPoints(angleY, angleX, -dx, -dy, 'rgba(0, 255, 255, 0.7)');
-    } else {
-      drawPoints(angleY, angleX, 0, 0);
+    // --- Optional emissive glow anchors (e.g. skull eyes) -----------------
+    for (const gp of objectGlowPoints) {
+      const eye = getRotatedProjectedPoint(gp, angleY, angleX);
+      drawEyeGlow(eye);
     }
-
-    // Draw eye socket flares
-    const leftEye = { x: -0.36, y: -0.12, z: 0.82 };
-    const rightEye = { x: 0.36, y: -0.12, z: 0.82 };
-    
-    const eyeL = getRotatedProjectedPoint(leftEye, angleY, angleX);
-    const eyeR = getRotatedProjectedPoint(rightEye, angleY, angleX);
-    
-    drawEyeGlow(eyeL);
-    drawEyeGlow(eyeR);
 
     requestAnimationFrame(drawFrame);
   }
 
-  function drawPoints(angY, angX, offsetOffsetX, offsetOffsetY, overrideColor) {
-    const displayWidth = canvas.clientWidth || 660;
-    const isMobileSize = displayWidth < 500;
-    
-    // Scale up dots and baseline alpha on mobile/small screens to compensate for canvas downscaling
-    const dotBase = isMobileSize ? 2.5 : 1.0;
-    const dotExtra = isMobileSize ? 3.0 : 1.5;
-    const alphaBase = isMobileSize ? 0.38 : 0.15;
-    const alphaExtra = isMobileSize ? 0.57 : 0.70;
-
-    for (let p of skullPoints) {
-      let pt = getRotatedProjectedPoint(p, angY, angX);
-      let xp = pt.xp + offsetOffsetX;
-      let yp = pt.yp + offsetOffsetY;
-
-      if (xp >= 0 && xp < width && yp >= 0 && yp < height) {
-        let t = (pt.z2 + 1.5) / 3.0;
-        t = Math.max(0, Math.min(1, t));
-
-        let r, g, b, alpha;
-        if (overrideColor) {
-          ctx.fillStyle = overrideColor;
-        } else {
-          // Blend Magenta (236, 72, 153) to Orange (249, 115, 22)
-          r = Math.round(236 + t * (249 - 236));
-          g = Math.round(72 + t * (115 - 72));
-          b = Math.round(153 + t * (22 - 153));
-          alpha = alphaBase + t * alphaExtra;
-          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        }
-
-        let dotSize = dotBase + t * dotExtra;
-        ctx.fillRect(xp - dotSize/2, yp - dotSize/2, dotSize, dotSize);
-      }
-    }
-  }
-
   function drawEyeGlow(eye) {
     if (eye.z2 < -0.1) return; // behind head
-    
+
     const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 250);
     const displayWidth = canvas.clientWidth || 660;
     const isMobileSize = displayWidth < 500;
@@ -279,7 +467,7 @@ function init3DSkullCanvas() {
     if (radius <= 0) return;
 
     const grad = ctx.createRadialGradient(eye.xp, eye.yp, 0, eye.xp, eye.yp, radius);
-    
+
     if (isGlitching) {
       grad.addColorStop(0, 'rgba(0, 255, 255, 0.9)');
       grad.addColorStop(0.5, 'rgba(0, 100, 255, 0.4)');
@@ -443,7 +631,8 @@ const logDatabase = [
   { type: 'info', text: 'INJECTING RECENT LEDGER ENTRIES TO COLD ARCHIVE...' },
   { type: 'success', text: 'ARCHIVE COMMITTED TO SECURE STORAGE.' },
   { type: 'info', text: 'ESTABLISHING HANDSHAKE PING TO CLOUD NETWORK...' },
-  { type: 'success', text: 'PING ESTABLISHED [RTT 14ms]. DEPLOYMENT READY.' }
+  { type: 'success', text: 'PING ESTABLISHED [RTT 14ms]. DEPLOYMENT READY.' },
+  { type: 'info', text: 'SIMULATION PORT COMPILED. RUN MAEVICRAFT AT /game/' }
 ];
 
 const easterEggLogs = [
@@ -453,7 +642,8 @@ const easterEggLogs = [
   { type: 'success', text: 'SOL0425: GENESIS BLOCK MINED SUCCESSFULLY [HASH: 0000x8a92f]' },
   { type: 'warn', text: 'PORTAL CALIBRATION: DETECTED SPATIAL ANOMALY IN MATRIX. CORRECTING...' },
   { type: 'error', text: 'FIREWALL ALERT: UNIDENTIFIED MALICIOUS SUBNET ATTEMPT DEFEATED.' },
-  { type: 'info', text: 'SYSTEM CAPACITORS FLOODED. POWER GRID AT 105% OVERLOAD.' }
+  { type: 'info', text: 'SYSTEM CAPACITORS FLOODED. POWER GRID AT 105% OVERLOAD.' },
+  { type: 'success', text: 'MAEVICRAFT IDLE LOADED. SIMULATE PRINT QUEUE: /game/' }
 ];
 
 let isTypingLog = false;

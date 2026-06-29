@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAEVICRAFT // 3D Printer Incremental Game</title>
+  <!-- Google Fonts via import inside design-system.css -->
+  <link rel="stylesheet" href="design-system.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="halftone-texture">
+
+  <!-- Top System Meta Bar -->
+  <div class="system-meta-bar">
+    <div class="layout-container flex justify-between">
+      <span>SYS STATUS: ACTIVE // NOZZLE_TEMP: <span id="temp-display">210</span>°C</span>
+      <span>RECYCLE MULTIPLIER: <span id="prestige-mult-display">1.0</span>x</span>
+      <span>V1.0.0 // LOCALTIME: <span id="clock-display">12:00:00</span></span>
+    </div>
+  </div>
+
+  <!-- Header Navigation -->
+  <header class="nav-header layout-container">
+    <div class="nav-brand text-gradient-immortals">MAEVICRAFT // IDLE</div>
+    <div class="resources-display">
+      <div class="resource-badge">
+        <span class="label">COINS</span>
+        <span class="value" id="coins-display">$0.00</span>
+      </div>
+      <div class="resource-badge accent">
+        <span class="label">CRYSTALS</span>
+        <span class="value" id="crystals-display">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Game Layout -->
+  <main class="layout-container main-grid">
+    
+    <!-- LEFT COLUMN: The Printer Viewport & Active Print Controls -->
+    <section class="viewport-column">
+      <div class="viewport-card">
+        <div class="viewport-header">
+          <div class="status-badge">
+            <span class="status-dot status-dot-active" id="status-indicator-dot"></span>
+            <span id="printer-status-text">PRINTING</span>
+          </div>
+          <div class="nozzle-status-label" id="active-model-name">MODEL: CALIBRATION_CUBE.gcode</div>
+        </div>
+
+        <!-- HTML5 Canvas Container -->
+        <div class="canvas-container">
+          <canvas id="printer-canvas" width="480" height="400"></canvas>
+          
+          <!-- Screen overlay scanlines/crt effect -->
+          <div class="crt-overlay"></div>
+        </div>
+
+        <!-- Progress Metrics -->
+        <div class="progress-section">
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill" id="print-progress-bar" style="width: 0%;"></div>
+            <span class="progress-percent" id="print-progress-text">0.0%</span>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-box">
+              <span class="label">EST. TIME</span>
+              <span class="value" id="metric-time-left">0.0s</span>
+            </div>
+            <div class="metric-box">
+              <span class="label">FILAMENT</span>
+              <span class="value" id="metric-filament-used">0.0g</span>
+            </div>
+            <div class="metric-box">
+              <span class="label">VALUE</span>
+              <span class="value text-green" id="metric-print-value">$10.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interaction Buttons -->
+        <div class="action-buttons-wrapper">
+          <button id="manual-extrude-btn" class="btn btn-primary btn-glow">
+            <span class="btn-text">MANUAL EXTRUDE</span>
+            <span class="btn-subtext">CLICK TO SPEED UP PRINTING</span>
+          </button>
+          <button id="collect-print-btn" class="btn btn-accent btn-glow" disabled>
+            <span class="btn-text">HARVEST PRINT</span>
+            <span class="btn-subtext">CLEAR BED & COLLECT COINS</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: Dashboard & Controls (Upgrades, Filaments, Spools, Prestige) -->
+    <section class="dashboard-column">
+      
+      <!-- Tab Navigation Header -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="upgrades">UPGRADES</button>
+        <button class="tab-btn" data-tab="filaments">FILAMENTS</button>
+        <button class="tab-btn" data-tab="models">MODELS</button>
+        <button class="tab-btn" data-tab="prestige">RECYCLE</button>
+        <button class="tab-btn" data-tab="settings">SYSTEM</button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="tab-content-wrapper">
+        
+        <!-- Tab: Upgrades -->
+        <div class="tab-pane active" id="tab-upgrades">
+          <div class="upgrade-list" id="hardware-upgrades-list">
+            <!-- Dynamically populated hardware upgrades -->
+          </div>
+        </div>
+
+        <!-- Tab: Filaments -->
+        <div class="tab-pane" id="tab-filaments">
+          <div class="info-banner margin-bottom-sm">
+            Filament spools determine the color of your prints on canvas and give global value multipliers.
+          </div>
+          <div class="filament-grid" id="filaments-list">
+            <!-- Dynamically populated filament types -->
+          </div>
+        </div>
+
+        <!-- Tab: Models Catalog -->
+        <div class="tab-pane" id="tab-models">
+          <div class="info-banner margin-bottom-sm">
+            Select standard G-code models to print. Higher tier models take longer but pay significantly more.
+          </div>
+          <div class="model-selection-grid" id="models-list">
+            <!-- Dynamically populated models list -->
+          </div>
+        </div>
+
+        <!-- Tab: Recycle (Prestige) -->
+        <div class="tab-pane" id="tab-prestige">
+          <div class="prestige-card">
+            <h3 class="text-gradient-immortals margin-bottom-sm">Recycle & Rebuild</h3>
+            <p class="margin-bottom-md">Meltdown your printed workshop waste to synthesize rare **Polylactic Crystals**. Resets your current printer levels and coins, but gives permanent speed & cash boosts.</p>
+            
+            <div class="terminal-panel margin-bottom-md">
+              <div class="terminal-row">
+                <span>Crystals on Reset:</span>
+                <span id="prestige-pending-tokens" class="text-green font-bold">+0</span>
+              </div>
+              <div class="terminal-row">
+                <span>Current Boost:</span>
+                <span id="prestige-current-boost-percent">0% speed & value boost</span>
+              </div>
+            </div>
+
+            <button id="prestige-btn" class="btn btn-danger" disabled>
+              RECYCLE ALL ASSETS FOR CRYSTALS
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab: Settings / System -->
+        <div class="tab-pane" id="tab-settings">
+          <div class="settings-panel">
+            <h3 class="margin-bottom-sm">System Diagnostics</h3>
+            
+            <div class="stats-panel terminal-panel margin-bottom-md" id="stats-container">
+              <!-- Dynamically populated stats -->
+            </div>
+
+            <div class="settings-actions">
+              <button class="btn btn-secondary" id="save-game-btn">SAVE STATE</button>
+              <button class="btn btn-secondary" id="export-save-btn">EXPORT SAVE</button>
+              <label for="import-file-input" class="btn btn-secondary text-center" style="cursor: pointer;">
+                IMPORT SAVE
+                <input type="file" id="import-file-input" style="display: none;">
+              </label>
+              <button class="btn btn-danger-subtle" id="reset-game-btn">WIPE DRIVE (RESET)</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="layout-container main-footer">
+    <p>MAEVICRAFT IDLE // CREATED BY DEEPMIND ANTIGRAVITY CO-PROGRAMMER // © 2026</p>
+  </footer>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="canvas.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
