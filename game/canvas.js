@@ -218,13 +218,15 @@ class PrinterCanvas {
 
   emitParticles(x, y, color) {
     // Spawn spark particles
+    const rainbowColors = ['#ff007f', '#7f00ff', '#00f0ff', '#00ff7f', '#ffbf00'];
     for (let i = 0; i < 3; i++) {
+      const pColor = color === 'rainbow' ? rainbowColors[Math.floor(Math.random() * rainbowColors.length)] : color;
       this.particles.push({
         x: x,
         y: y,
         vx: (Math.random() - 0.5) * 3,
         vy: (Math.random() - 0.3) * -2 - 0.5,
-        color: color,
+        color: pColor,
         life: 1.0,
         decay: 0.03 + Math.random() * 0.03,
         size: Math.random() * 3 + 1
@@ -242,6 +244,20 @@ class PrinterCanvas {
         this.particles.splice(i, 1);
       }
     }
+  }
+
+  getFilamentStyle(color, x1, y1, x2, y2) {
+    if (color === 'rainbow') {
+      const grad = this.ctx.createLinearGradient(x1, y1, x2, y2);
+      grad.addColorStop(0.0, '#ff007f'); // Neon Pink/Red
+      grad.addColorStop(0.2, '#7f00ff'); // Purple
+      grad.addColorStop(0.4, '#00f0ff'); // Cyan
+      grad.addColorStop(0.6, '#00ff7f'); // Green
+      grad.addColorStop(0.8, '#ffbf00'); // Gold/Yellow
+      grad.addColorStop(1.0, '#ff007f'); // Neon Pink
+      return grad;
+    }
+    return color;
   }
 
   draw(state, activeFilament, activeModel) {
@@ -272,6 +288,13 @@ class PrinterCanvas {
     // 2. Extract Sprite Info
     const sprite = SPRITES[activeModel.spriteId] || SPRITES.cube;
     const filamentColor = activeFilament.color;
+    const modelFillStyle = this.getFilamentStyle(
+      filamentColor, 
+      this.modelLeft, 
+      0, 
+      this.modelLeft + this.spriteWidth * this.scale, 
+      0
+    );
 
     // Calculate total pixels to print
     let totalPrintablePixels = 0;
@@ -303,7 +326,7 @@ class PrinterCanvas {
           if (currentPixelCount <= pixelsToPrint) {
             // Draw printed pixel
             const canvasX = this.modelLeft + c * this.scale;
-            ctx.fillStyle = filamentColor;
+            ctx.fillStyle = modelFillStyle;
             ctx.fillRect(canvasX, canvasY, this.scale - 1, this.scale - 1);
             
             // Subtle pixel shadow/depth
@@ -426,7 +449,7 @@ class PrinterCanvas {
     ctx.arc(0, 0, 8, 0, Math.PI * 2);
     ctx.fill();
     // Spool filament coil
-    ctx.strokeStyle = filamentColor;
+    ctx.strokeStyle = this.getFilamentStyle(filamentColor, -15, 0, 15, 0);
     ctx.lineWidth = 8;
     ctx.beginPath();
     ctx.arc(0, 0, 15, 0, Math.PI * 2);
@@ -446,7 +469,7 @@ class PrinterCanvas {
 
     // Filament line from spool down to print head
     ctx.beginPath();
-    ctx.strokeStyle = filamentColor;
+    ctx.strokeStyle = this.getFilamentStyle(filamentColor, spoolX, spoolY + 24, this.nozzleX, gantryY);
     ctx.lineWidth = 2;
     // Curved filament path
     ctx.moveTo(spoolX, spoolY + 24);

@@ -99,7 +99,6 @@ function init() {
   // Auto save every 15 seconds
   saveInterval = setInterval(() => {
     saveGame();
-    showToast('State Auto-Saved to Disk', 'info');
   }, 15000);
 
   // Initial UI refresh
@@ -820,6 +819,11 @@ function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
+  // Prevent toast list from overflowing the screen
+  while (container.children.length >= 3) {
+    container.firstChild.remove();
+  }
+
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerText = message.toUpperCase();
@@ -828,7 +832,9 @@ function showToast(message, type = 'info') {
   
   // Auto remove
   setTimeout(() => {
-    toast.remove();
+    if (toast.parentNode === container) {
+      toast.remove();
+    }
   }, 3000);
 }
 
