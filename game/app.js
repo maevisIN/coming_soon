@@ -277,6 +277,9 @@ function handleCollectPrint() {
 }
 
 function buyUpgrade(type) {
+  if (typeof state.upgrades[type] !== 'number' || isNaN(state.upgrades[type])) {
+    state.upgrades[type] = 0;
+  }
   const currentLvl = state.upgrades[type];
   const cost = getUpgradeCost(type, currentLvl);
   
@@ -410,6 +413,9 @@ function renderUpgradeTab() {
   
   Object.keys(UPGRADE_TEMPLATES).forEach(key => {
     const template = UPGRADE_TEMPLATES[key];
+    if (typeof state.upgrades[key] !== 'number' || isNaN(state.upgrades[key])) {
+      state.upgrades[key] = 0;
+    }
     const level = state.upgrades[key];
     const cost = getUpgradeCost(key, level);
     const costText = `$${cost.toLocaleString()}`;
@@ -792,7 +798,16 @@ function importSave(e) {
       const parsed = JSON.parse(decrypted);
       
       if (parsed.coins !== undefined && parsed.upgrades !== undefined) {
-        state = parsed;
+        // Safe merge to prevent dropping new properties from future updates
+        Object.keys(parsed).forEach(k => {
+          if (state[k] !== undefined) {
+            if (typeof state[k] === 'object' && !Array.isArray(state[k]) && state[k] !== null) {
+              state[k] = { ...state[k], ...parsed[k] };
+            } else {
+              state[k] = parsed[k];
+            }
+          }
+        });
         saveGame();
         renderAllTabs();
         updateUI();
